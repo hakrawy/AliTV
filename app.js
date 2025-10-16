@@ -55,6 +55,25 @@ $("#searchInput").addEventListener("input", (e)=>{
   });
 });
 
+// ===== Skeleton Loader Utility =====
+function showSkeleton(gridSelector, count = 8) {
+  const grid = document.querySelector(gridSelector);
+  if (!grid) return;
+  grid.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const sk = document.createElement("div");
+    sk.className = "card skeleton";
+    sk.style.height = "240px";
+    grid.appendChild(sk);
+  }
+}
+
+function hideSkeleton(gridSelector) {
+  const grid = document.querySelector(gridSelector);
+  if (!grid) return;
+  grid.querySelectorAll(".skeleton").forEach(el => el.remove());
+}
+
 // TMDB
 async function loadTrending(type="movie"){
   const res = await fetch(`${API_BASE}/api/tmdb/trending?type=${type}`);
