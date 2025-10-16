@@ -1,0 +1,42 @@
+window.I18N = {
+  ar: {
+    trending: "الشائع الآن",
+    movies: "أفلام",
+    series: "مسلسلات",
+    livetv: "البث المباشر",
+    watchNow: "شاهد الآن",
+    moreInfo: "المزيد من التفاصيل",
+    search: "بحث...",
+    pasteM3U: "الصق رابط قائمة M3U",
+    import: "استيراد",
+    orUseDefault: "أو استخدم قائمة iptv-org الافتراضية",
+    all: "الكل",
+    news: "أخبار",
+    sports: "رياضة",
+    kids: "أطفال",
+    favorites: "المفضلة",
+    epg: "دليل القنوات",
+    epgLoading: "جار جلب الجدول…",
+    freeWatch: "روابط مشاهدة مجانية"
+  },
+  en: {
+    trending: "Trending",
+    movies: "Movies",
+    series: "Series",
+    livetv: "Live TV",
+    watchNow: "Watch Now",
+    moreInfo: "More Info",
+    search: "Search...",
+    pasteM3U: "Paste M3U URL",
+    import: "Import",
+    orUseDefault: "or use iptv-org default below",
+    all: "All",
+    news: "News",
+    sports: "Sports",
+    kids: "Kids",
+    favorites: "Favorites",
+    epg: "EPG",
+    epgLoading: "Loading…",
+    freeWatch: "Free Watch Links"
+  }
+};

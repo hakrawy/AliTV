@@ -1,0 +1,245 @@
+:root {
+  --bg: #0b0b0f;
+  --bg2: #121218;
+  --fg: #fff;
+  --accent: #e50914;
+  --muted: #aaa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at center, #101014 0%, #0b0b0f 100%);
+  color: var(--fg);
+  margin: 0;
+  font-family: "Tajawal", system-ui, Segoe UI, Arial, sans-serif;
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+/* ===== Splash ===== */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #12080b, #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 999;
+  animation: splashFadeOut 1.4s ease 2.4s forwards;
+}
+
+#splash .logo-anim {
+  font-size: 56px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 25px rgba(229, 9, 20, 0.8);
+  animation: popIn 1s ease-out forwards;
+}
+
+#splash .tagline {
+  margin-top: 10px;
+  color: #ccc;
+  opacity: 0;
+  animation: fadeInUp 1.2s ease 0.8s forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splashFadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ===== Header ===== */
+#topbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(11, 11, 15, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 10px 14px;
+  border-bottom: 1px solid #1f1f26;
+  z-index: 50;
+}
+.brand {
+  font-weight: 900;
+  font-size: 26px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+.tabs .tab-btn {
+  background: transparent;
+  border: 0;
+  color: #bbb;
+  margin: 0 3px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.tabs .tab-btn.active,
+.tabs .tab-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* ===== Skeleton Loader ===== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #1b1b1f 25%,
+    #24242c 50%,
+    #1b1b1f 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+@keyframes shimmer {
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== Cards ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.card {
+  position: relative;
+  background: #141418;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(229, 9, 20, 0.25);
+}
+.card .thumb {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9);
+  transition: filter 0.3s ease;
+}
+.card:hover .thumb {
+  filter: brightness(1);
+}
+.card .meta {
+  padding: 10px;
+  font-size: 14px;
+  color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fav {
+  background: #2b2b35;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  padding: 5px 7px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.fav.active {
+  background: var(--accent);
+}
+
+/* ===== Chips (Filters) ===== */
+.chip {
+  background: #1a1a24;
+  border: none;
+  color: #ccc;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.chip:hover {
+  background: #222230;
+}
+.chip.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ===== Player ===== */
+.player-panel {
+  background: #000;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 8px;
+  margin-top: 12px;
+}
+video {
+  width: 100%;
+  height: 240px;
+  border-radius: 8px;
+  background: #000;
+}
+.epg {
+  color: #bbb;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* ===== Footer ===== */
+#footer {
+  padding: 16px;
+  text-align: center;
+  color: #888;
+  border-top: 1px solid #1e1e26;
+  margin-top: 30px;
+  font-size: 13px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  #topbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  .card .thumb {
+    height: 180px;
+  }
+}
