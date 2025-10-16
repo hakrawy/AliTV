@@ -112,14 +112,27 @@ body {
   transform: scale(1.08);
 }
 
+.right-tools {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+#langSelect, #epgSelect, #searchInput {
+  background: #1a1a24;
+  color: #ddd;
+  border: 1px solid #2a2a33;
+  border-radius: 6px;
+  padding: 6px 10px;
+  outline: none;
+  font-family: inherit;
+}
+#searchInput::placeholder {
+  color: #888;
+}
+
 /* ===== Skeleton Loader ===== */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #1b1b1f 25%,
-    #24242c 50%,
-    #1b1b1f 75%
-  );
+  background: linear-gradient(90deg, #1b1b1f 25%, #24242c 50%, #1b1b1f 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 10px;
@@ -220,6 +233,39 @@ video {
   margin-top: 6px;
 }
 
+/* ===== Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+.modal-body {
+  background: #111;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 640px;
+  color: #fff;
+  position: relative;
+}
+#closeModal {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #e50914;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
 /* ===== Footer ===== */
 #footer {
   padding: 16px;
@@ -241,5 +287,8 @@ video {
   }
   .card .thumb {
     height: 180px;
+  }
+  video {
+    height: 200px;
   }
 }
