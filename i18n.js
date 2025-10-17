@@ -10,7 +10,7 @@ window.I18N = {
     xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
     settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override",
     provider:"Provider", providerEngine:"Search Engine", providerDomain:"Site Domain (optional)",
-    watchOn:"Watch on"
+    watchOn:"Watch on", streams:"Streams"
   },
   en: {
     trending:"Trending Now", movies:"Movies", series:"Series", livetv:"Live TV",
@@ -23,7 +23,7 @@ window.I18N = {
     xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
     settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override",
     provider:"Provider", providerEngine:"Search Engine", providerDomain:"Site Domain (optional)",
-    watchOn:"Watch on"
+    watchOn:"Watch on", streams:"Streams"
   }
 };
 

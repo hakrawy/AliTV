@@ -319,6 +319,21 @@ async function showMoreInfo(item){
     n.innerHTML = `<a class="btn" target="_blank" href="${primaryLink}">${t('watchOn')} ${dom||eng}</a>`;
     document.querySelector('#modalContent')?.appendChild(n);
   }catch{}
+
+  // Fetch provider streams from backend (legal providers like Archive.org)
+  try{
+    const boxTitle = document.createElement('h3'); boxTitle.textContent = t('streams'); boxTitle.style.marginTop = '12px';
+    const listBox = document.createElement('div'); listBox.id = 'providerList'; listBox.style.display='flex'; listBox.style.flexWrap='wrap'; listBox.style.gap='8px';
+    const root = document.querySelector('#modalContent'); if(root){ root.appendChild(boxTitle); root.appendChild(listBox); }
+    const url = `${API_BASE}/api/providers/search?title=${encodeURIComponent(title)}&year=${encodeURIComponent(year||'')}&type=${encodeURIComponent(type)}`;
+    const r = await fetch(url); const j = await r.json(); const items = j.items||[];
+    if(items.length===0){ const small=document.createElement('div'); small.style.opacity='.7'; small.style.fontSize='12px'; small.textContent='No streams found'; listBox.appendChild(small); }
+    items.forEach(it=>{
+      const a = document.createElement('a'); a.className='ghost ripple'; a.target='_blank'; a.href = it.url||'#';
+      a.textContent = `${it.provider||'Source'} ${it.quality?`(${it.quality})`:''}`;
+      listBox.appendChild(a);
+    });
+  }catch{}
 }
 async function openTrailer(item){
   const type=item.media_type||(item.title?"movie":"tv"); const ep=type==="movie"?"movie":"tv";

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
+import { searchProviders } from './providers/index.js';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -203,6 +204,17 @@ app.post('/api/xtream/import', async (req, res) => {
     res.json({ channels });
   } catch (e) {
     res.status(500).json({ error: 'xtream_failed' });
+  }
+});
+
+// Providers (legal/public sources)
+app.get('/api/providers/search', async (req, res) => {
+  try {
+    const { title = '', year = '', type = '' } = req.query;
+    const items = await searchProviders({ title, year, type });
+    res.json({ items });
+  } catch (e) {
+    res.status(500).json({ error: 'providers_failed' });
   }
 });
 
