@@ -102,16 +102,21 @@
     <span>AliTV — للعائلة والأصدقاء ❤️</span>
   </footer>
 
-  <!-- Modal -->
+  <!-- نافذة المعلومات -->
   <div id="modal" class="hidden modal">
     <div class="modal-body">
       <button id="closeModal">×</button>
       <div id="modalContent"></div>
-      <div id="playerModal" style="display:none">
-        <div class="player-panel" style="margin:0;">
-          <video id="player" controls playsinline></video>
-          <div class="epg"><b data-i18n="epg">دليل القنوات</b> — <span id="epgNow" data-i18n="epgLoading">جار جلب الجدول…</span></div>
-        </div>
+    </div>
+  </div>
+
+  <!-- نافذة المشغل المنبثقة -->
+  <div id="playerModal" class="hidden modal">
+    <div class="modal-body">
+      <button id="closePlayer">×</button>
+      <div class="player-panel" style="margin:0;">
+        <video id="player" controls playsinline></video>
+        <div class="epg"><b data-i18n="epg">دليل القنوات</b> — <span id="epgNow" data-i18n="epgLoading">جار جلب الجدول…</span></div>
       </div>
     </div>
   </div>
