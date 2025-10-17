@@ -4,30 +4,55 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>AliTV — للعائلة والأصدقاء</title>
+
+  <!-- Favicon (اختياري) -->
+  <link rel="icon" href="favicon.ico"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css"/>
+
+  <!-- HLS player -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+</head>
+<body class="dark">
+  <!-- Splash -->
+  <div id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="logo-anim">AliTV</div>
+      <div class="tagline">AliTV — Created by Ali for family & friends ❤️</div>
+    </div>
+    <audio id="startSound" src="startup.mp3" preload="auto"></audio>
+  </div>
+
+  <!-- Header -->
+  <header id="topbar">
+    <div class="brand">AliTV</div>
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="trending" role="tab">الشائع الآن</button>
+      <button class="tab-btn" data-tab="movies" role="tab">أفلام</button>
+      <button class="tab-btn" data-tab="series" role="tab">مسلسلات</button>
+      <button class="tab-btn" data-tab="livetv" role="tab">البث المباشر</button>
+    </nav>
+    <div class="right-tools">
+      <select id="langSelect" aria-label="Language">
+        <option value="ar" selected>العربية</option>
+        <option value="en">English</option>
+      </select>
+      <input id="searchInput" placeholder="بحث..." aria-label="بحث"/>
+      <select id="epgSelect" title="EPG Source" aria-label="EPG">
+        <option value="">EPG: iptv-org (sa-ar)</option>
+        <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/ae-ar.xml">الإمارات (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/qa-ar.xml">قطر (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/eg-ar.xml">مصر (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/ma-ar.xml">المغرب (عربي)</option>
+      </select>
+    </div>
+  </header>
+
     <!-- Live TV -->
     <section id="section-livetv" class="tab-section hidden" aria-labelledby="tab-livetv">
       <div class="player-area">
-        <video id="player" controls playsinline></video>
-        <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
-      </div>
-
-      <div class="import">
-        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U" aria-label="M3U URL"/>
-        <button id="importBtn" class="primary ripple">استيراد</button>
-        <span class="hint">أو استخدم قائمة iptv-org الافتراضية</span>
-      </div>
-
-      <div class="quick-filters">
-        <button class="chip active" data-group="all">الكل</button>
-        <button class="chip" data-group="news">أخبار</button>
-        <button class="chip" data-group="sports">رياضة</button>
-        <button class="chip" data-group="kids">أطفال</button>
-        <button class="chip" data-group="movies">أفلام</button>
-        <button class="chip" data-group="series">مسلسلات</button>
-      </div>
-
-      <div id="grid-livetv" class="grid fadein"></div>
-    </section>
         <video id="player" controls playsinline></video>
         <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
       </div>
