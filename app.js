@@ -1,3 +1,21 @@
+// دوال تحميل الأفلام والمسلسلات
+async function loadMovies(){
+  showSkeleton("#grid-movies");
+  const data = await cacheFetch("tmdb_movies", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=movie`).then(r=>r.json()));
+  hideSkeleton("#grid-movies");
+  const grid = $("#grid-movies");
+  grid.innerHTML = "";
+  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
+
+async function loadSeries(){
+  showSkeleton("#grid-series");
+  const data = await cacheFetch("tmdb_series", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=tv`).then(r=>r.json()));
+  hideSkeleton("#grid-series");
+  const grid = $("#grid-series");
+  grid.innerHTML = "";
+  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
 // ===== helpers =====
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -20,9 +38,13 @@ langSelect.onchange = ()=>{ LANG = langSelect.value; localStorage.setItem("alitv
 // ===== tabs =====
 function activate(tab){
   // header buttons
-  $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab===tab));
-  // sections visibility
-  $$(".tab-section").forEach(s => s.classList.toggle("hidden", !s.id.endsWith(tab)));
+  $$(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  $$(".tab-section").forEach(s=>s.classList.toggle("hidden", !s.id.endsWith(tab)));
+  $("#hero").classList.toggle("hidden", tab!=="trending");
+
+  // تحميل المحتوى
+  if(tab==="movies") loadMovies();
+  else if(tab==="series") loadSeries();
   // hero only for trending
   $("#hero").classList.toggle("hidden", tab!=="trending");
 }
