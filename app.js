@@ -227,15 +227,37 @@ const __lazyBgObserver = new IntersectionObserver((entries, obs)=>{
 function observeLazyBg(el){ if(el) __lazyBgObserver.observe(el); }
 
 // ===== TMDB (trending / hero / details) =====
-async function loadTrending(type="movie"){
-  showSkeleton("#grid-trending");
-  const data = await cacheFetch(`tmdb_trending_${type}`, ()=> fetch(`${API_BASE}/api/tmdb/trending?type=${type}`).then(r=>r.json()));
-  const results = data.results || [];
-  hideSkeleton("#grid-trending");
-  const grid = $("#grid-trending"); grid.innerHTML="";
-  results.forEach(item => grid.appendChild(makeTmdbCard(item)));
-  renderHero(results);
-  setupLazyIn('#grid-trending');
+// paging state + infinite loader
+const STATE = {
+  trending: { type:'movie', page:1, loading:false, done:false },
+  movies:   { page:1, loading:false, done:false },
+  series:   { page:1, loading:false, done:false },
+};
+const __moreObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting && typeof e.target.__loadMore==='function'){ e.target.__loadMore(); } });
+},{ rootMargin:'800px 0px' });
+function ensureSentinel(gridSelector, onLoadMore){
+  const grid = document.querySelector(gridSelector); if(!grid || !grid.parentElement) return;
+  let s = grid.parentElement.querySelector('.load-sentinel');
+  if(!s){ s = document.createElement('div'); s.className='load-sentinel'; s.style.height='1px'; s.style.opacity='0'; grid.parentElement.appendChild(s); }
+  s.__loadMore = onLoadMore; __moreObserver.observe(s);
+}
+
+async function loadTrending(type="movie", append=false){
+  const st = STATE.trending; if(!append){ st.type=type; st.page=1; st.done=false; st.loading=false; }
+  if(st.loading || st.done) return; st.loading=true;
+  if(!append) showSkeleton('#grid-trending');
+  try{
+    const res = await fetch(`${API_BASE}/api/tmdb/trending?type=${type}&page=${st.page}`); const data = await res.json();
+    const results = data.results || [];
+    const grid = $('#grid-trending'); if(!append){ hideSkeleton('#grid-trending'); grid.innerHTML=''; }
+    results.forEach(item => grid.appendChild(makeTmdbCard(item)));
+    if(!append) { renderHero(results); }
+    setupLazyIn('#grid-trending');
+    st.page += 1; if(results.length === 0) st.done = true;
+    ensureSentinel('#grid-trending', ()=> loadTrending(st.type, true));
+  }catch(e){ console.error(e); st.done=true; }
+  st.loading=false;
 }
 function renderHero(results){
   const track = $("#carousel-track"); track.innerHTML="";
@@ -294,25 +316,39 @@ async function openTrailer(item){
 }
 
 // trending picker
-$$(".pill").forEach(p=> p.onclick=()=>{ $$(".pill").forEach(x=>x.classList.remove("active")); p.classList.add("active"); loadTrending(p.dataset.type); });
-loadTrending("movie");
+$$(".pill").forEach(p=> p.onclick=()=>{ $$(".pill").forEach(x=>x.classList.remove("active")); p.classList.add("active"); STATE.trending.done=false; STATE.trending.page=1; loadTrending(p.dataset.type,false); });
+loadTrending("movie", false);
 
 // ===== Movies & Series sections =====
-async function loadMovies(){
-  showSkeleton("#grid-movies");
-  const data = await cacheFetch("tmdb_movies", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=movie`).then(r=>r.json()));
-  hideSkeleton("#grid-movies");
-  const grid=$("#grid-movies"); grid.innerHTML="";
-  (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
-  setupLazyIn('#grid-movies');
+async function loadMovies(append=false){
+  const st = STATE.movies; if(!append){ st.page=1; st.done=false; st.loading=false; }
+  if(st.loading || st.done) return; st.loading=true;
+  if(!append) showSkeleton('#grid-movies');
+  try{
+    const res = await fetch(`${API_BASE}/api/tmdb/discover?type=movie&page=${st.page}`); const data = await res.json();
+    const results = data.results || [];
+    const grid=$("#grid-movies"); if(!append){ hideSkeleton('#grid-movies'); grid.innerHTML=''; }
+    (results).forEach(item => grid.appendChild(makeTmdbCard(item)));
+    setupLazyIn('#grid-movies');
+    st.page += 1; if(results.length === 0) st.done = true;
+    ensureSentinel('#grid-movies', ()=> loadMovies(true));
+  }catch(e){ console.error(e); st.done=true; }
+  st.loading=false;
 }
-async function loadSeries(){
-  showSkeleton("#grid-series");
-  const data = await cacheFetch("tmdb_series", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=tv`).then(r=>r.json()));
-  hideSkeleton("#grid-series");
-  const grid=$("#grid-series"); grid.innerHTML="";
-  (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
-  setupLazyIn('#grid-series');
+async function loadSeries(append=false){
+  const st = STATE.series; if(!append){ st.page=1; st.done=false; st.loading=false; }
+  if(st.loading || st.done) return; st.loading=true;
+  if(!append) showSkeleton('#grid-series');
+  try{
+    const res = await fetch(`${API_BASE}/api/tmdb/discover?type=tv&page=${st.page}`); const data = await res.json();
+    const results = data.results || [];
+    const grid=$("#grid-series"); if(!append){ hideSkeleton('#grid-series'); grid.innerHTML=''; }
+    (results).forEach(item => grid.appendChild(makeTmdbCard(item)));
+    setupLazyIn('#grid-series');
+    st.page += 1; if(results.length === 0) st.done = true;
+    ensureSentinel('#grid-series', ()=> loadSeries(true));
+  }catch(e){ console.error(e); st.done=true; }
+  st.loading=false;
 }
 
 // ===== Live TV =====
@@ -402,5 +438,5 @@ epgSelect.value = localStorage.getItem("alitv_epg") || epgSelect.value;
 epgSelect.onchange = ()=> localStorage.setItem("alitv_epg", epgSelect.value);
 
 // init
-loadTrending("movie");
+loadTrending("movie", false);
 loadLiveTV();
