@@ -350,6 +350,7 @@ body {
   padding: 10px;
   margin: 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  display: none;
 }
 
 video {

@@ -181,6 +181,8 @@ $("#favBtn").onclick = ()=>{
 // Play channel + EPG + Continue Watching
 async function playChannel(ch){
   const s = ch.streams && ch.streams[0]; if (!s) return alert("لا يوجد رابط بث");
+  // إظهار المشغل عند اختيار قناة
+  $(".player-panel").style.display = "block";
   const video = $("#player");
   if (Hls.isSupported()) {
     if (window.__hls) window.__hls.destroy();
