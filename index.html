@@ -50,25 +50,30 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section id="hero" class="carousel hidden" aria-hidden="true">
-    <div id="carousel-track"></div>
-    <div class="carousel-actions">
-      <button id="watchNow" class="primary ripple">شاهد الآن</button>
-      <button id="moreInfo" class="ghost ripple">المزيد من التفاصيل</button>
-    </div>
-  </section>
-
-  <!-- Main -->
-  <main id="content">
-    <!-- Trending -->
-    <section id="section-trending" class="tab-section" aria-labelledby="tab-trending">
-      <div class="filter">
-        <button class="pill active" data-type="movie">أفلام</button>
-        <button class="pill" data-type="tv">مسلسلات</button>
-        <button id="favBtn" class="pill">المفضلة</button>
+    <!-- Live TV -->
+    <section id="section-livetv" class="tab-section hidden" aria-labelledby="tab-livetv">
+      <div class="player-area">
+        <video id="player" controls playsinline></video>
+        <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
       </div>
-      <div id="grid-trending" class="grid fadein"></div>
+
+      <div class="import">
+        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U" aria-label="M3U URL"/>
+        <button id="importBtn" class="primary ripple">استيراد</button>
+        <span class="hint">أو استخدم قائمة iptv-org الافتراضية</span>
+      </div>
+
+      <div class="quick-filters">
+        <button class="chip active" data-group="all">الكل</button>
+        <button class="chip" data-group="news">أخبار</button>
+        <button class="chip" data-group="sports">رياضة</button>
+        <button class="chip" data-group="kids">أطفال</button>
+        <button class="chip" data-group="movies">أفلام</button>
+        <button class="chip" data-group="series">مسلسلات</button>
+      </div>
+
+      <div id="grid-livetv" class="grid fadein"></div>
+    </section>
     </section>
 
     <!-- Movies -->

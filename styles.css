@@ -1,3 +1,41 @@
+/* ===== Live TV Player stylish ===== */
+.player-area {
+  width: 100%;
+  background: linear-gradient(to bottom, #000 40%, #0b0b0f 100%);
+  border-bottom: 1px solid #1a1a1a;
+  padding: 20px 10px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.player-area video {
+  width: min(90%, 960px);
+  height: 480px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  background: #000;
+}
+
+.player-area .epg {
+  margin-top: 12px;
+  color: #ccc;
+  font-size: 15px;
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width:768px){
+  .player-area video{
+    width: 95%;
+    height: 220px;
+  }
+}
 :root{
   --bg:#0b0b0f; --bg2:#121218; --fg:#fff; --accent:#e50914; --muted:#aaa;
 }
