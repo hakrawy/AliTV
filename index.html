@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>AliTV — للعائلة والأصدقاء</title>
+  <link rel="icon" href="favicon.ico"/>
   <link rel="stylesheet" href="styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
@@ -14,29 +15,29 @@
       <div class="logo-anim">AliTV</div>
       <div class="tagline">AliTV — Created by Ali for family & friends ❤️</div>
     </div>
+    <audio id="startup-audio" src="startup.mp3" preload="auto"></audio>
   </div>
 
+  <!-- Header -->
   <header id="topbar">
     <div class="brand glow">AliTV</div>
     <nav class="tabs">
-      <button class="tab-btn active" data-tab="trending" data-i18n="trending">الشائع الآن</button>
-      <button class="tab-btn" data-tab="movies" data-i18n="movies">أفلام</button>
-      <button class="tab-btn" data-tab="series" data-i18n="series">مسلسلات</button>
-      <button class="tab-btn" data-tab="livetv" data-i18n="livetv">البث المباشر</button>
+      <button class="tab-btn active" data-tab="trending">الشائع الآن</button>
+      <button class="tab-btn" data-tab="movies">أفلام</button>
+      <button class="tab-btn" data-tab="series">مسلسلات</button>
+      <button class="tab-btn" data-tab="livetv">البث المباشر</button>
     </nav>
     <div class="right-tools">
       <select id="langSelect">
         <option value="ar" selected>العربية</option>
         <option value="en">English</option>
       </select>
-      <input id="searchInput" placeholder="بحث..." data-i18n-placeholder="search"/>
-      <select id="epgSelect" title="EPG Source">
+      <input id="searchInput" placeholder="بحث..."/>
+      <select id="epgSelect">
         <option value="">EPG: iptv-org (sa-ar)</option>
-        <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية (عربي)</option>
-        <option value="https://iptv-org.github.io/epg/guides/ae-ar.xml">الإمارات (عربي)</option>
-        <option value="https://iptv-org.github.io/epg/guides/qa-ar.xml">قطر (عربي)</option>
-        <option value="https://iptv-org.github.io/epg/guides/eg-ar.xml">مصر (عربي)</option>
-        <option value="https://iptv-org.github.io/epg/guides/ma-ar.xml">المغرب (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية</option>
+        <option value="https://iptv-org.github.io/epg/guides/ae-ar.xml">الإمارات</option>
+        <option value="https://iptv-org.github.io/epg/guides/eg-ar.xml">مصر</option>
       </select>
     </div>
   </header>
@@ -45,75 +46,65 @@
   <section id="hero" class="carousel hidden">
     <div id="carousel-track"></div>
     <div class="carousel-actions">
-      <button id="watchNow" class="primary" data-i18n="watchNow">شاهد الآن</button>
-      <button id="moreInfo" class="ghost" data-i18n="moreInfo">المزيد من التفاصيل</button>
+      <button id="watchNow" class="primary ripple">شاهد الآن</button>
+      <button id="moreInfo" class="ghost ripple">المزيد من التفاصيل</button>
     </div>
   </section>
 
-  <!-- المشغل سيظهر في نافذة منبثقة فقط -->
+  <!-- Main content -->
   <main id="content">
-    <!-- Trending -->
     <section id="section-trending" class="tab-section">
       <div class="filter">
-        <button class="pill active" data-type="movie" data-i18n="movies">أفلام</button>
-        <button class="pill" data-type="tv" data-i18n="series">مسلسلات</button>
-        <button id="favBtn" class="pill" data-i18n="favorites">المفضلة</button>
+        <button class="pill active" data-type="movie">أفلام</button>
+        <button class="pill" data-type="tv">مسلسلات</button>
+        <button id="favBtn" class="pill">المفضلة</button>
       </div>
       <div id="grid-trending" class="grid fadein"></div>
     </section>
 
-    <!-- Movies -->
     <section id="section-movies" class="tab-section hidden">
-      <h2 data-i18n="movies">أفلام</h2>
+      <h2>أفلام</h2>
       <div id="grid-movies" class="grid fadein"></div>
     </section>
 
-    <!-- Series -->
     <section id="section-series" class="tab-section hidden">
-      <h2 data-i18n="series">مسلسلات</h2>
+      <h2>مسلسلات</h2>
       <div id="grid-series" class="grid fadein"></div>
     </section>
 
-    <!-- Live TV -->
     <section id="section-livetv" class="tab-section hidden">
       <div class="import">
-        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U" data-i18n-placeholder="pasteM3U"/>
-        <button id="importBtn" class="primary" data-i18n="import">استيراد</button>
-        <span class="hint" data-i18n="orUseDefault">أو استخدم قائمة iptv-org الافتراضية</span>
+        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U"/>
+        <button id="importBtn" class="primary ripple">استيراد</button>
+        <span class="hint">أو استخدم قائمة iptv-org الافتراضية</span>
       </div>
 
       <div class="quick-filters">
-        <button class="chip active" data-group="all" data-i18n="all">الكل</button>
-        <button class="chip" data-group="news" data-i18n="news">أخبار</button>
-        <button class="chip" data-group="sports" data-i18n="sports">رياضة</button>
-        <button class="chip" data-group="kids" data-i18n="kids">أطفال</button>
-        <button class="chip" data-group="movies" data-i18n="movies">أفلام</button>
-        <button class="chip" data-group="series" data-i18n="series">مسلسلات</button>
+        <button class="chip active" data-group="all">الكل</button>
+        <button class="chip" data-group="news">أخبار</button>
+        <button class="chip" data-group="sports">رياضة</button>
+        <button class="chip" data-group="kids">أطفال</button>
+        <button class="chip" data-group="movies">أفلام</button>
       </div>
 
       <div id="grid-livetv" class="grid fadein"></div>
 
-      <!-- المشغل سيتم نقله لأسفل الصفحة -->
+      <div class="player-panel">
+        <video id="player" controls playsinline></video>
+        <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
+      </div>
     </section>
   </main>
 
-
   <footer id="footer">
-    <span>AliTV — للعائلة والأصدقاء ❤️</span>
+    <span>AliTV — صنع بحب ❤️ للأهل والأصدقاء</span>
   </footer>
 
-  <!-- نافذة المعلومات -->
   <div id="modal" class="hidden modal">
     <div class="modal-body">
       <button id="closeModal">×</button>
       <div id="modalContent"></div>
     </div>
-  </div>
-
-  <!-- المشغل في أعلى الصفحة -->
-  <div class="player-panel" style="display:none; margin: 20px 0 0 0;">
-    <video id="player" controls playsinline></video>
-    <div class="epg"><b data-i18n="epg">دليل القنوات</b> — <span id="epgNow" data-i18n="epgLoading">جار جلب الجدول…</span></div>
   </div>
 
   <script src="config.js"></script>
