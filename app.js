@@ -5,20 +5,7 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 // ===== splash + sound =====
 window.addEventListener("load", () => {
   const a = $("#startSound");
-  if (a) {
-    a.volume = 0.6;
-    a.play().catch(() => {
-      // إذا منع المتصفح التشغيل التلقائي، شغّل الصوت عند أول تفاعل
-      const playOnUserAction = () => {
-        a.currentTime = 0;
-        a.play().catch(()=>{});
-        window.removeEventListener("click", playOnUserAction);
-        window.removeEventListener("touchstart", playOnUserAction);
-      };
-      window.addEventListener("click", playOnUserAction);
-      window.addEventListener("touchstart", playOnUserAction);
-    });
-  }
+  if (a) { a.volume = 0.6; a.play().catch(()=>{}); }
   setTimeout(() => { $("#splash").classList.add("fade-out"); }, 900);
   setTimeout(() => { $("#splash")?.remove(); }, 1800);
 });
@@ -32,34 +19,11 @@ langSelect.onchange = ()=>{ LANG = langSelect.value; localStorage.setItem("alitv
 
 // ===== tabs =====
 function activate(tab){
-  // header buttons
   $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab===tab));
-  // sections visibility
   $$(".tab-section").forEach(s => s.classList.toggle("hidden", !s.id.endsWith(tab)));
-  // hero only for trending
   $("#hero").classList.toggle("hidden", tab!=="trending");
-
-  // تحميل الأفلام والمسلسلات عند اختيار القسم
-  if(tab==="movies") loadMovies();
-  else if(tab==="series") loadSeries();
-// دوال تحميل الأفلام والمسلسلات
-async function loadMovies(){
-  showSkeleton("#grid-movies");
-  const data = await cacheFetch("tmdb_movies", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=movie`).then(r=>r.json()));
-  hideSkeleton("#grid-movies");
-  const grid = $("#grid-movies");
-  grid.innerHTML = "";
-  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
-}
-
-async function loadSeries(){
-  showSkeleton("#grid-series");
-  const data = await cacheFetch("tmdb_series", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=tv`).then(r=>r.json()));
-  hideSkeleton("#grid-series");
-  const grid = $("#grid-series");
-  grid.innerHTML = "";
-  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
-}
+  if (tab==="movies") loadMovies();
+  else if (tab==="series") loadSeries();
 }
 $$(".tab-btn").forEach(btn => btn.onclick = ()=> activate(btn.dataset.tab));
 activate("trending");
@@ -75,7 +39,7 @@ const progress = JSON.parse(localStorage.getItem(progKey)||"{}");
 function toggleFav(id){ favs.has(id) ? favs.delete(id) : favs.add(id); localStorage.setItem(favKey, JSON.stringify([...favs])); }
 function saveProgress(id, seconds){ progress[id] = { t: Date.now(), seconds }; localStorage.setItem(progKey, JSON.stringify(progress)); }
 
-// ===== search (filters visible cards) =====
+// ===== search =====
 $("#searchInput").addEventListener("input", e=>{
   const q = e.target.value.toLowerCase();
   $$("#content .grid .card").forEach(c=>{
@@ -161,6 +125,22 @@ async function openTrailer(item){
 $$(".pill").forEach(p=> p.onclick=()=>{ $$(".pill").forEach(x=>x.classList.remove("active")); p.classList.add("active"); loadTrending(p.dataset.type); });
 loadTrending("movie");
 
+// ===== Movies & Series sections =====
+async function loadMovies(){
+  showSkeleton("#grid-movies");
+  const data = await cacheFetch("tmdb_movies", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=movie`).then(r=>r.json()));
+  hideSkeleton("#grid-movies");
+  const grid=$("#grid-movies"); grid.innerHTML="";
+  (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
+async function loadSeries(){
+  showSkeleton("#grid-series");
+  const data = await cacheFetch("tmdb_series", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=tv`).then(r=>r.json()));
+  hideSkeleton("#grid-series");
+  const grid=$("#grid-series"); grid.innerHTML="";
+  (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
+
 // ===== Live TV =====
 let allChannels=[];
 async function loadLiveTV(){
@@ -194,9 +174,8 @@ $$(".chip").forEach(btn => btn.onclick = ()=>{
   renderChannels(allChannels.filter(c => (c.group||"").toLowerCase().includes(g.toLowerCase())));
 });
 
-// favorites view on trending
+// favorites view (trending section)
 $("#favBtn").onclick = ()=>{
-  // يخفّي غير المفضّلة ضمن القسم الحالي فقط
   $$("#section-trending .grid .card").forEach(c=>{
     const isFav = c.querySelector(".fav")?.classList.contains("active");
     c.style.display = isFav ? "" : "none";
@@ -220,9 +199,10 @@ async function playChannel(ch){
 
   // EPG
   const epgNow=$("#epgNow"); epgNow.textContent="جارٍ جلب الجدول…";
-  const src = localStorage.getItem("alitv_epg") || CONFIG.defaultEPG;
+  const srcSelect = $("#epgSelect");
+  const srcVal = srcSelect.value || CONFIG.defaultEPG;
   try{
-    const r = await fetch(`${API_BASE}/api/epg?channel=${encodeURIComponent(ch.id)}&source=${encodeURIComponent(src)}`);
+    const r = await fetch(`${API_BASE}/api/epg?channel=${encodeURIComponent(ch.id)}&source=${encodeURIComponent(srcVal)}`);
     const j = await r.json();
     const first=(j.items||[])[0];
     const title = first?.title ? (first.title._ || first.title) : "";
@@ -241,5 +221,11 @@ $("#importBtn").onclick = async ()=>{
   hideSkeleton("#grid-livetv");
 };
 
+// persist EPG source
+const epgSelect = $("#epgSelect");
+epgSelect.value = localStorage.getItem("alitv_epg") || epgSelect.value;
+epgSelect.onchange = ()=> localStorage.setItem("alitv_epg", epgSelect.value);
+
 // init
+loadTrending("movie");
 loadLiveTV();

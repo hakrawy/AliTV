@@ -4,14 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>AliTV — للعائلة والأصدقاء</title>
-
-  <!-- Favicon (اختياري) -->
   <link rel="icon" href="favicon.ico"/>
-
-  <!-- Styles -->
   <link rel="stylesheet" href="styles.css"/>
-
-  <!-- HLS player -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
 <body class="dark">
@@ -21,7 +15,7 @@
       <div class="logo-anim">AliTV</div>
       <div class="tagline">AliTV — Created by Ali for family & friends ❤️</div>
     </div>
-    <audio id="startSound" src="startup.mp3" preload="auto"></audio>
+    <audio id="startSound" src="assets/start-chime.mp3" preload="auto"></audio>
   </div>
 
   <!-- Header -->
@@ -38,7 +32,7 @@
         <option value="ar" selected>العربية</option>
         <option value="en">English</option>
       </select>
-      <input id="searchInput" placeholder="بحث..." aria-label="بحث"/>
+      <input id="searchInput" placeholder="بحث..." aria-label="بحث" />
       <select id="epgSelect" title="EPG Source" aria-label="EPG">
         <option value="">EPG: iptv-org (sa-ar)</option>
         <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية (عربي)</option>
@@ -85,6 +79,12 @@
 
     <!-- Live TV -->
     <section id="section-livetv" class="tab-section hidden" aria-labelledby="tab-livetv">
+      <!-- Player on top -->
+      <div class="player-area">
+        <video id="player" controls playsinline></video>
+        <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
+      </div>
+
       <div class="import">
         <input id="m3uUrl" placeholder="الصق رابط قائمة M3U" aria-label="M3U URL"/>
         <button id="importBtn" class="primary ripple">استيراد</button>
@@ -101,11 +101,6 @@
       </div>
 
       <div id="grid-livetv" class="grid fadein"></div>
-
-      <div class="player-panel">
-        <video id="player" controls playsinline></video>
-        <div class="epg"><b>دليل القنوات</b> — <span id="epgNow">جارٍ جلب الجدول…</span></div>
-      </div>
     </section>
   </main>
 
@@ -121,7 +116,6 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="config.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
