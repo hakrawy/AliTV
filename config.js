@@ -6,10 +6,11 @@
   const globalOverride = win.__ALITV_API_BASE__ || win.__API_BASE__ || null;
   const host = (typeof location !== 'undefined') ? location.hostname : '';
   const heuristic = (host === 'localhost' || host === '127.0.0.1') ? 'http://localhost:3000' : 'https://hakrawy-backend.onrender.com';
-  // eslint-disable-next-line no-var
-  var API_BASE = lsOverride || globalOverride || heuristic;
+  const resolved = lsOverride || globalOverride || heuristic;
+  // expose globally for scripts loaded after this file
+  try { (typeof globalThis!=='undefined' ? globalThis : window).API_BASE = resolved; } catch { /* noop */ }
   // expose for debugging
-  if (win) win.__RESOLVED_API_BASE__ = API_BASE;
+  if (win) win.__RESOLVED_API_BASE__ = resolved;
 })();
 const TMDB_API_KEY = "0775f71fe7655df78ef9d1738087d4e6";
 
