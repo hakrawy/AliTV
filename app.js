@@ -181,9 +181,17 @@ $("#favBtn").onclick = ()=>{
 // Play channel + EPG + Continue Watching
 async function playChannel(ch){
   const s = ch.streams && ch.streams[0]; if (!s) return alert("لا يوجد رابط بث");
-  // إظهار المشغل عند اختيار قناة
-  $(".player-panel").style.display = "block";
+    // إظهار نافذة المشغل المنبثقة
+    $("#modal").classList.remove("hidden");
+    $("#playerModal").style.display = "block";
   const video = $("#player");
+$("#closeModal").onclick = ()=> {
+  $("#modal").classList.add("hidden");
+  $("#playerModal").style.display = "none";
+  // إيقاف الفيديو عند الإغلاق
+  const video = $("#player");
+  if (video) { video.pause(); video.src = ""; }
+};
   if (Hls.isSupported()) {
     if (window.__hls) window.__hls.destroy();
     const hls = new Hls(); window.__hls = hls;

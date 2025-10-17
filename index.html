@@ -50,10 +50,7 @@
     </div>
   </section>
 
-  <div class="player-panel">
-    <video id="player" controls playsinline></video>
-    <div class="epg"><b data-i18n="epg">دليل القنوات</b> — <span id="epgNow" data-i18n="epgLoading">جار جلب الجدول…</span></div>
-  </div>
+  <!-- المشغل سيظهر في نافذة منبثقة فقط -->
   <main id="content">
     <!-- Trending -->
     <section id="section-trending" class="tab-section">
@@ -110,6 +107,12 @@
     <div class="modal-body">
       <button id="closeModal">×</button>
       <div id="modalContent"></div>
+      <div id="playerModal" style="display:none">
+        <div class="player-panel" style="margin:0;">
+          <video id="player" controls playsinline></video>
+          <div class="epg"><b data-i18n="epg">دليل القنوات</b> — <span id="epgNow" data-i18n="epgLoading">جار جلب الجدول…</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
