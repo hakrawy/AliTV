@@ -183,10 +183,12 @@ async function playChannel(ch){
   const s = ch.streams && ch.streams[0]; if (!s) return alert("لا يوجد رابط بث");
   // إظهار نافذة المشغل المنبثقة المستقلة
   $("#playerModal").classList.remove("hidden");
+  $("#playerModal .player-panel").style.display = "block";
   const video = $("#player");
   // زر إغلاق خاص بالمشغل
   $("#closePlayer").onclick = ()=> {
     $("#playerModal").classList.add("hidden");
+    $("#playerModal .player-panel").style.display = "none";
     if (video) { video.pause(); video.src = ""; }
   };
   if (Hls.isSupported()) {
