@@ -307,6 +307,18 @@ async function showMoreInfo(item){
     <p style="opacity:.9">${d.overview||""}</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">${freeLinks}</div>
   `);
+  try{
+    const eng = (localStorage.getItem('alitv_engine')||'ddg');
+    const dom = localStorage.getItem('alitv_provider_domain')||'';
+    const sq = encodeURIComponent(`${title} ${year} ${type==='movie'?'full movie':'series'}`);
+    let primaryLink = '';
+    if(eng==='youtube') primaryLink = `https://www.youtube.com/results?search_query=${sq}`;
+    else if(eng==='google') primaryLink = dom ? `https://www.google.com/search?q=site%3A${encodeURIComponent(dom)}+${sq}` : `https://www.google.com/search?q=${sq}`;
+    else primaryLink = dom ? `https://duckduckgo.com/?q=site%3A${encodeURIComponent(dom)}+${sq}` : `https://duckduckgo.com/?q=${sq}`;
+    const n = document.createElement('div'); n.style.marginTop='8px';
+    n.innerHTML = `<a class="btn" target="_blank" href="${primaryLink}">${t('watchOn')} ${dom||eng}</a>`;
+    document.querySelector('#modalContent')?.appendChild(n);
+  }catch{}
 }
 async function openTrailer(item){
   const type=item.media_type||(item.title?"movie":"tv"); const ep=type==="movie"?"movie":"tv";

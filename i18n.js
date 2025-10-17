@@ -8,7 +8,9 @@ window.I18N = {
     nowPlaying:"الآن يعرض:", noEPG:"لا توجد بيانات حالياً", loading:"جاري التحميل...", error:"حدث خطأ أثناء الجلب."
     , xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
     xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
-    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override"
+    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override",
+    provider:"Provider", providerEngine:"Search Engine", providerDomain:"Site Domain (optional)",
+    watchOn:"Watch on"
   },
   en: {
     trending:"Trending Now", movies:"Movies", series:"Series", livetv:"Live TV",
@@ -19,7 +21,9 @@ window.I18N = {
     nowPlaying:"Now Playing:", noEPG:"No data currently available", loading:"Loading...", error:"An error occurred while fetching data.",
     xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
     xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
-    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override"
+    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override",
+    provider:"Provider", providerEngine:"Search Engine", providerDomain:"Site Domain (optional)",
+    watchOn:"Watch on"
   }
 };
 

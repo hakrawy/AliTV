@@ -34,8 +34,10 @@ function tmdbGet(url, params = {}) {
 app.get('/api/tmdb/trending', async (req, res) => {
   try {
     const type = req.query.type === 'tv' ? 'tv' : 'movie';
-    const data = await remember(`tmdb_trending_${type}`, 10 * 60 * 1000, () =>
-      tmdbGet(`/trending/${type}/week`)
+    const page = parseInt(req.query.page || '1', 10);
+    const key = `tmdb_trending_${type}_p${page}`;
+    const data = await remember(key, 10 * 60 * 1000, () =>
+      tmdbGet(`/trending/${type}/week`, { page })
     );
     res.json({ results: data.results || [] });
   } catch (e) {
@@ -46,8 +48,10 @@ app.get('/api/tmdb/trending', async (req, res) => {
 app.get('/api/tmdb/discover', async (req, res) => {
   try {
     const type = req.query.type === 'tv' ? 'tv' : 'movie';
-    const data = await remember(`tmdb_discover_${type}`, 10 * 60 * 1000, () =>
-      tmdbGet(`/discover/${type}`, { sort_by: 'popularity.desc' })
+    const page = parseInt(req.query.page || '1', 10);
+    const key = `tmdb_discover_${type}_p${page}`;
+    const data = await remember(key, 10 * 60 * 1000, () =>
+      tmdbGet(`/discover/${type}`, { sort_by: 'popularity.desc', page })
     );
     res.json({ results: data.results || [] });
   } catch (e) {
@@ -209,4 +213,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`AliTV backend listening on :${PORT}`);
 });
-
