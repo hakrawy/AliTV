@@ -7,7 +7,8 @@ window.I18N = {
     epg:"دليل القنوات", epgLoading:"جارٍ جلب الجدول…", freeWatch:"روابط مشاهدة مجانية",
     nowPlaying:"الآن يعرض:", noEPG:"لا توجد بيانات حالياً", loading:"جاري التحميل...", error:"حدث خطأ أثناء الجلب."
     , xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
-    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream"
+    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
+    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override"
   },
   en: {
     trending:"Trending Now", movies:"Movies", series:"Series", livetv:"Live TV",
@@ -17,7 +18,8 @@ window.I18N = {
     epg:"Channel Guide", epgLoading:"Loading schedule…", freeWatch:"Free Watch Links",
     nowPlaying:"Now Playing:", noEPG:"No data currently available", loading:"Loading...", error:"An error occurred while fetching data.",
     xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
-    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream"
+    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream",
+    settings:"Settings", apiBase:"API Base URL", save:"Save", cancel:"Cancel", clear:"Clear Override"
   }
 };
 

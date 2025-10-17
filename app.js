@@ -82,6 +82,42 @@ activate("trending");
 function openModal(html){ $("#modalContent").innerHTML = html; $("#modal").classList.remove("hidden"); }
 $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
 
+// ===== Settings (API Base) =====
+(function setupSettings(){
+  const tools = document.querySelector('.right-tools'); if(!tools) return;
+  const btn = document.createElement('button');
+  btn.id = 'settingsBtn'; btn.className = 'ghost ripple'; btn.title = t('settings');
+  btn.setAttribute('aria-label', t('settings'));
+  btn.textContent = '⚙️';
+  tools.appendChild(btn);
+
+  function openSettings(){
+    const current = (window.__RESOLVED_API_BASE__ || (typeof API_BASE !== 'undefined' ? API_BASE : ''));
+    const ls = (()=>{ try{return localStorage.getItem('alitv_api_base')||'';}catch{return '';} })();
+    const html = `
+      <h3 data-i18n="settings">Settings</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label><span data-i18n="apiBase">API Base URL</span></label>
+        <input id="apiBaseInput" value="${ls||current}" placeholder="https://your-backend" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:8px 10px;"/>
+        <div style="opacity:.8;font-size:12px">Resolved: ${current}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="saveApiBase" class="primary ripple" data-i18n="save">Save</button>
+          <button id="clearApiBase" class="ghost ripple" data-i18n="clear">Clear Override</button>
+        </div>
+      </div>`;
+    openModal(html); applyI18n();
+    const save = document.getElementById('saveApiBase');
+    const clear = document.getElementById('clearApiBase');
+    save?.addEventListener('click', ()=>{
+      const v = String(document.getElementById('apiBaseInput').value||'').trim();
+      try{ if(v){ localStorage.setItem('alitv_api_base', v); } }catch{}
+      location.reload();
+    });
+    clear?.addEventListener('click', ()=>{ try{ localStorage.removeItem('alitv_api_base'); }catch{} location.reload(); });
+  }
+  btn.addEventListener('click', openSettings);
+})();
+
 // ===== Import UI (M3U / Xtream) =====
 (function setupImportUI(){
   const box = document.querySelector('.import'); if(!box) return;
