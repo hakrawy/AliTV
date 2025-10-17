@@ -25,6 +25,28 @@ function activate(tab){
   $$(".tab-section").forEach(s => s.classList.toggle("hidden", !s.id.endsWith(tab)));
   // hero only for trending
   $("#hero").classList.toggle("hidden", tab!=="trending");
+
+  // تحميل الأفلام والمسلسلات عند اختيار القسم
+  if(tab==="movies") loadMovies();
+  else if(tab==="series") loadSeries();
+// دوال تحميل الأفلام والمسلسلات
+async function loadMovies(){
+  showSkeleton("#grid-movies");
+  const data = await cacheFetch("tmdb_movies", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=movie`).then(r=>r.json()));
+  hideSkeleton("#grid-movies");
+  const grid = $("#grid-movies");
+  grid.innerHTML = "";
+  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
+
+async function loadSeries(){
+  showSkeleton("#grid-series");
+  const data = await cacheFetch("tmdb_series", ()=> fetch(`${API_BASE}/api/tmdb/discover?type=tv`).then(r=>r.json()));
+  hideSkeleton("#grid-series");
+  const grid = $("#grid-series");
+  grid.innerHTML = "";
+  (data.results || []).forEach(item => grid.appendChild(makeTmdbCard(item)));
+}
 }
 $$(".tab-btn").forEach(btn => btn.onclick = ()=> activate(btn.dataset.tab));
 activate("trending");
