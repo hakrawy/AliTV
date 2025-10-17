@@ -5,7 +5,20 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 // ===== splash + sound =====
 window.addEventListener("load", () => {
   const a = $("#startSound");
-  if (a) { a.volume = 0.6; a.play().catch(()=>{}); }
+  if (a) {
+    a.volume = 0.6;
+    a.play().catch(() => {
+      // إذا منع المتصفح التشغيل التلقائي، شغّل الصوت عند أول تفاعل
+      const playOnUserAction = () => {
+        a.currentTime = 0;
+        a.play().catch(()=>{});
+        window.removeEventListener("click", playOnUserAction);
+        window.removeEventListener("touchstart", playOnUserAction);
+      };
+      window.addEventListener("click", playOnUserAction);
+      window.addEventListener("touchstart", playOnUserAction);
+    });
+  }
   setTimeout(() => { $("#splash").classList.add("fade-out"); }, 900);
   setTimeout(() => { $("#splash")?.remove(); }, 1800);
 });
