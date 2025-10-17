@@ -6,6 +6,8 @@ window.I18N = {
     favorites:"المفضلة", all:"الكل", news:"أخبار", sports:"رياضة", kids:"أطفال",
     epg:"دليل القنوات", epgLoading:"جارٍ جلب الجدول…", freeWatch:"روابط مشاهدة مجانية",
     nowPlaying:"الآن يعرض:", noEPG:"لا توجد بيانات حالياً", loading:"جاري التحميل...", error:"حدث خطأ أثناء الجلب."
+    , xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
+    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream"
   },
   en: {
     trending:"Trending Now", movies:"Movies", series:"Series", livetv:"Live TV",
@@ -13,7 +15,9 @@ window.I18N = {
     import:"Import", pasteM3U:"Paste M3U playlist link", orUseDefault:"Or use iptv-org default list",
     favorites:"Favorites", all:"All", news:"News", sports:"Sports", kids:"Kids",
     epg:"Channel Guide", epgLoading:"Loading schedule…", freeWatch:"Free Watch Links",
-    nowPlaying:"Now Playing:", noEPG:"No data currently available", loading:"Loading...", error:"An error occurred while fetching data."
+    nowPlaying:"Now Playing:", noEPG:"No data currently available", loading:"Loading...", error:"An error occurred while fetching data.",
+    xtream:"Xtream Codes", xtreamHost:"Server / Host", xtreamPort:"Port", xtreamUser:"Username", xtreamPass:"Password",
+    xtreamImport:"Import Xtream", importSource:"Import Source", sourceM3U:"M3U", sourceXtream:"Xtream"
   }
 };
 

@@ -10,12 +10,62 @@ window.addEventListener("load", () => {
   setTimeout(() => { $("#splash")?.remove(); }, 1800);
 });
 
+// inject SVG favicon (red 'A')
+(function(){
+  try{
+    const old = document.querySelector('link[rel="icon"]');
+    if(old) old.remove();
+    const link = document.createElement('link');
+    link.rel = 'icon'; link.type = 'image/svg+xml'; link.href = 'assets/favicon.svg';
+    document.head.appendChild(link);
+  }catch{}
+})();
+
+// ripple effect (delegated)
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.ripple');
+  if(!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const wave = document.createElement('span'); wave.className = 'ripple-wave';
+  const x = e.clientX - rect.left, y = e.clientY - rect.top;
+  wave.style.left = x + 'px'; wave.style.top = y + 'px';
+  const d = Math.max(rect.width, rect.height); wave.style.width = wave.style.height = d + 'px';
+  btn.appendChild(wave); setTimeout(()=> wave.remove(), 650);
+});
+
 // ===== i18n init =====
 const langSelect = $("#langSelect");
 let LANG = localStorage.getItem("alitv_lang") || CONFIG.defaultLang;
 langSelect.value = LANG;
 applyI18n();
 langSelect.onchange = ()=>{ LANG = langSelect.value; localStorage.setItem("alitv_lang", LANG); applyI18n(); };
+
+// wire i18n bindings for existing DOM
+(function wireI18n(){
+  const mapText = [
+    [".tab-btn[data-tab='trending']","trending"],
+    [".tab-btn[data-tab='movies']","movies"],
+    [".tab-btn[data-tab='series']","series"],
+    [".tab-btn[data-tab='livetv']","livetv"],
+    ["#watchNow","watchNow"],
+    ["#moreInfo","moreInfo"],
+    ["#favBtn","favorites"],
+    [".pill[data-type='movie']","movies"],
+    [".pill[data-type='tv']","series"],
+    [".chip[data-group='all']","all"],
+    [".chip[data-group='news']","news"],
+    [".chip[data-group='sports']","sports"],
+    [".chip[data-group='kids']","kids"],
+    [".chip[data-group='movies']","movies"],
+    [".chip[data-group='series']","series"],
+    ["#importBtn","import"],
+    [".import .hint","orUseDefault"],
+  ];
+  mapText.forEach(([sel,key])=>{ const el=document.querySelector(sel); if(el) el.setAttribute('data-i18n', key); });
+  const mapPh = [ ["#searchInput","search"], ["#m3uUrl","pasteM3U"] ];
+  mapPh.forEach(([sel,key])=>{ const el=document.querySelector(sel); if(el) el.setAttribute('data-i18n-placeholder', key); });
+  applyI18n();
+})();
 
 // ===== tabs =====
 function activate(tab){
@@ -31,6 +81,64 @@ activate("trending");
 // ===== modal =====
 function openModal(html){ $("#modalContent").innerHTML = html; $("#modal").classList.remove("hidden"); }
 $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
+
+// ===== Import UI (M3U / Xtream) =====
+(function setupImportUI(){
+  const box = document.querySelector('.import'); if(!box) return;
+  const m3uInput = document.querySelector('#m3uUrl');
+  const m3uBtn = document.querySelector('#importBtn');
+  // Mode selector
+  const modeWrap = document.createElement('div'); modeWrap.style.margin = '6px 0';
+  modeWrap.innerHTML = `
+    <label style="margin-inline-end:8px" data-i18n="importSource">Import Source</label>
+    <select id="importMode" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:6px 8px;">
+      <option value="m3u" data-i18n="sourceM3U">M3U</option>
+      <option value="xtream" data-i18n="sourceXtream">Xtream</option>
+    </select>`;
+  box.insertBefore(modeWrap, box.firstChild);
+
+  // Xtream fields
+  const xt = document.createElement('div'); xt.id = 'xtreamBox'; xt.style.display = 'none'; xt.style.marginTop = '8px';
+  xt.innerHTML = `
+    <input id="xtHost" placeholder="Server / Host" data-i18n-placeholder="xtreamHost" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:8px 10px; margin-inline-end:6px" />
+    <input id="xtPort" placeholder="Port" data-i18n-placeholder="xtreamPort" value="80" style="width:90px;background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:8px 10px; margin-inline-end:6px" />
+    <input id="xtUser" placeholder="Username" data-i18n-placeholder="xtreamUser" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:8px 10px; margin-inline-end:6px" />
+    <input id="xtPass" type="password" placeholder="Password" data-i18n-placeholder="xtreamPass" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:8px 10px; margin-inline-end:6px" />
+    <button id="xtreamBtn" class="ghost ripple" data-i18n="xtreamImport">Import Xtream</button>
+  `;
+  box.appendChild(xt);
+
+  const modeSel = document.querySelector('#importMode');
+  modeSel.onchange = ()=>{
+    const useXt = modeSel.value === 'xtream';
+    xt.style.display = useXt ? '' : 'none';
+    if(m3uInput) m3uInput.style.display = useXt ? 'none' : '';
+    if(m3uBtn) m3uBtn.style.display = useXt ? 'none' : '';
+    applyI18n();
+  };
+  applyI18n();
+
+  const xtBtn = document.querySelector('#xtreamBtn');
+  xtBtn?.addEventListener('click', async ()=>{
+    const host = (document.querySelector('#xtHost')?.value||'').trim();
+    const port = (document.querySelector('#xtPort')?.value||'').trim() || '80';
+    const username = (document.querySelector('#xtUser')?.value||'').trim();
+    const password = (document.querySelector('#xtPass')?.value||'').trim();
+    if(!host || !username || !password){ alert(t('error')); return; }
+    showSkeleton('#grid-livetv', 10);
+    try{
+      const resp = await fetch(`${API_BASE}/api/xtream/import`,{
+        method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
+        body: JSON.stringify({ host, port, username, password })
+      });
+      const data = await resp.json();
+      if(!resp.ok) throw new Error('xtream failed');
+      allChannels = data.channels || [];
+      renderChannels(allChannels);
+    }catch(e){ alert(t('error')); }
+    hideSkeleton('#grid-livetv');
+  });
+})();
 
 // ===== fav & progress =====
 const favKey = "alitv_favs"; const progKey = "alitv_progress";
@@ -57,6 +165,31 @@ function hideSkeleton(gridSelector){
   const grid = document.querySelector(gridSelector); if(!grid) return; grid.querySelectorAll(".skeleton").forEach(el=>el.remove());
 }
 
+// helper: prepare lazy backgrounds inside a container
+function setupLazyIn(selector){
+  const root = document.querySelector(selector); if(!root) return;
+  root.querySelectorAll('.thumb, .poster').forEach(el=>{
+    if(el.hasAttribute('data-bg')){ observeLazyBg(el); return; }
+    const style = el.style && el.style.backgroundImage || '';
+    const m = style.match(/url\(['\"]?([^)'\"]+)/);
+    if(m && m[1]){
+      el.classList.add('lazy-bg'); el.setAttribute('data-bg', m[1]); el.style.backgroundImage='';
+      observeLazyBg(el);
+    }
+  });
+}
+
+// lazy-load for background images
+const __lazyBgObserver = new IntersectionObserver((entries, obs)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){ const el=entry.target; const bg=el.getAttribute('data-bg');
+      if(bg){ el.style.backgroundImage = `url('${bg}')`; el.removeAttribute('data-bg'); }
+      obs.unobserve(el);
+    }
+  });
+},{ rootMargin: '200px' });
+function observeLazyBg(el){ if(el) __lazyBgObserver.observe(el); }
+
 // ===== TMDB (trending / hero / details) =====
 async function loadTrending(type="movie"){
   showSkeleton("#grid-trending");
@@ -66,19 +199,22 @@ async function loadTrending(type="movie"){
   const grid = $("#grid-trending"); grid.innerHTML="";
   results.forEach(item => grid.appendChild(makeTmdbCard(item)));
   renderHero(results);
+  setupLazyIn('#grid-trending');
 }
 function renderHero(results){
   const track = $("#carousel-track"); track.innerHTML="";
   results.slice(0,8).forEach(item=>{
     const bg = item.backdrop_path ? `${CONFIG.tmdb.imageBase}/w780${item.backdrop_path}` :
                item.poster_path ? `${CONFIG.tmdb.imageBase}/w500${item.poster_path}` : "";
-    const p = document.createElement("div"); p.className="poster"; p.style.backgroundImage=`url('${bg}')`;
+    const p = document.createElement("div"); p.className="poster lazy-bg"; p.setAttribute('data-bg', bg);
     p.innerHTML = `<div class="meta">${item.title||item.name||""}</div>`;
     p.onclick = ()=> showMoreInfo(item);
     track.appendChild(p);
+    observeLazyBg(p);
   });
   $("#watchNow").onclick = ()=> results[0] && openTrailer(results[0]);
   $("#moreInfo").onclick = ()=> results[0] && showMoreInfo(results[0]);
+  setupLazyIn('#hero');
 }
 function makeTmdbCard(item){
   const el=document.createElement("div"); el.className="card";
@@ -132,6 +268,7 @@ async function loadMovies(){
   hideSkeleton("#grid-movies");
   const grid=$("#grid-movies"); grid.innerHTML="";
   (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
+  setupLazyIn('#grid-movies');
 }
 async function loadSeries(){
   showSkeleton("#grid-series");
@@ -139,6 +276,7 @@ async function loadSeries(){
   hideSkeleton("#grid-series");
   const grid=$("#grid-series"); grid.innerHTML="";
   (data.results||[]).forEach(item => grid.appendChild(makeTmdbCard(item)));
+  setupLazyIn('#grid-series');
 }
 
 // ===== Live TV =====
@@ -165,6 +303,7 @@ function renderChannels(list){
     };
     grid.appendChild(d);
   });
+  setupLazyIn('#grid-livetv');
 }
 
 // quick filters
