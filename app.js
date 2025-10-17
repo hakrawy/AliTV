@@ -201,6 +201,9 @@ function hideSkeleton(gridSelector){
   const grid = document.querySelector(gridSelector); if(!grid) return; grid.querySelectorAll(".skeleton").forEach(el=>el.remove());
 }
 
+// small fetch helper
+async function fetchJson(url){ const r = await fetch(url); if(!r.ok) throw new Error('http '+r.status); return r.json(); }
+
 // helper: prepare lazy backgrounds inside a container
 function setupLazyIn(selector){
   const root = document.querySelector(selector); if(!root) return;
@@ -248,13 +251,19 @@ async function loadTrending(type="movie", append=false){
   if(st.loading || st.done) return; st.loading=true;
   if(!append) showSkeleton('#grid-trending');
   try{
-    const res = await fetch(`${API_BASE}/api/tmdb/trending?type=${type}&page=${st.page}`); const data = await res.json();
-    const results = data.results || [];
+    let results = [];
+    if(!append){
+      const data0 = await cacheFetch(`tmdb_trending_${type}`, ()=> fetchJson(`${API_BASE}/api/tmdb/trending?type=${type}`));
+      results = data0.results || [];
+    } else {
+      const data = await fetchJson(`${API_BASE}/api/tmdb/trending?type=${type}&page=${st.page}`);
+      results = data.results || [];
+    }
     const grid = $('#grid-trending'); if(!append){ hideSkeleton('#grid-trending'); grid.innerHTML=''; }
     results.forEach(item => grid.appendChild(makeTmdbCard(item)));
-    if(!append) { renderHero(results); }
+    if(!append) { renderHero(results); st.page = 2; }
     setupLazyIn('#grid-trending');
-    st.page += 1; if(results.length === 0) st.done = true;
+    if(append) st.page += 1; if(results.length === 0) st.done = true;
     ensureSentinel('#grid-trending', ()=> loadTrending(st.type, true));
   }catch(e){ console.error(e); st.done=true; }
   st.loading=false;
@@ -329,9 +338,10 @@ async function showMoreInfo(item){
     const r = await fetch(url); const j = await r.json(); const items = j.items||[];
     if(items.length===0){ const small=document.createElement('div'); small.style.opacity='.7'; small.style.fontSize='12px'; small.textContent='No streams found'; listBox.appendChild(small); }
     items.forEach(it=>{
-      const a = document.createElement('a'); a.className='ghost ripple'; a.target='_blank'; a.href = it.url||'#';
-      a.textContent = `${it.provider||'Source'} ${it.quality?`(${it.quality})`:''}`;
-      listBox.appendChild(a);
+      const b = document.createElement('button'); b.className='ghost ripple';
+      b.textContent = `${it.provider||'Source'} ${it.quality?`(${it.quality})`:''}`;
+      b.onclick = ()=> openStream(it);
+      listBox.appendChild(b);
     });
   }catch{}
 }
@@ -342,9 +352,28 @@ async function openTrailer(item){
   if(v) window.open(`https://www.youtube.com/watch?v=${v.key}`,"_blank");
 }
 
+// play VOD stream inside modal (mp4/m3u8)
+function openStream(item){
+  const title = item.provider || 'Stream';
+  openModal(`
+    <h3 style="margin-top:0">${title}</h3>
+    <video id="vodPlayer" controls playsinline style="width:100%;max-height:70vh;background:#000;border-radius:12px"></video>
+  `);
+  const v = document.getElementById('vodPlayer');
+  try{
+    const url = item.url;
+    if(/\.m3u8($|\?)/i.test(url) && window.Hls && Hls.isSupported()){
+      if(window.__vodHls) try{ window.__vodHls.destroy(); }catch{}
+      const h=new Hls(); window.__vodHls=h; h.loadSource(url); h.attachMedia(v); h.on(Hls.Events.MANIFEST_PARSED, ()=> v.play());
+    } else {
+      v.src = url; v.play();
+    }
+  }catch(e){ console.error(e); }
+}
+
 // trending picker
 $$(".pill").forEach(p=> p.onclick=()=>{ $$(".pill").forEach(x=>x.classList.remove("active")); p.classList.add("active"); STATE.trending.done=false; STATE.trending.page=1; loadTrending(p.dataset.type,false); });
-loadTrending("movie", false);
+// initial load handled above; avoid double-trigger
 
 // ===== Movies & Series sections =====
 async function loadMovies(append=false){
@@ -352,12 +381,18 @@ async function loadMovies(append=false){
   if(st.loading || st.done) return; st.loading=true;
   if(!append) showSkeleton('#grid-movies');
   try{
-    const res = await fetch(`${API_BASE}/api/tmdb/discover?type=movie&page=${st.page}`); const data = await res.json();
-    const results = data.results || [];
+    let results=[];
+    if(!append){
+      const data0 = await cacheFetch('tmdb_movies', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=movie`));
+      results = data0.results || [];
+    } else {
+      const data = await fetchJson(`${API_BASE}/api/tmdb/discover?type=movie&page=${st.page}`);
+      results = data.results || [];
+    }
     const grid=$("#grid-movies"); if(!append){ hideSkeleton('#grid-movies'); grid.innerHTML=''; }
     (results).forEach(item => grid.appendChild(makeTmdbCard(item)));
     setupLazyIn('#grid-movies');
-    st.page += 1; if(results.length === 0) st.done = true;
+    if(!append) st.page = 2; else st.page += 1; if(results.length === 0) st.done = true;
     ensureSentinel('#grid-movies', ()=> loadMovies(true));
   }catch(e){ console.error(e); st.done=true; }
   st.loading=false;
@@ -367,12 +402,18 @@ async function loadSeries(append=false){
   if(st.loading || st.done) return; st.loading=true;
   if(!append) showSkeleton('#grid-series');
   try{
-    const res = await fetch(`${API_BASE}/api/tmdb/discover?type=tv&page=${st.page}`); const data = await res.json();
-    const results = data.results || [];
+    let results=[];
+    if(!append){
+      const data0 = await cacheFetch('tmdb_series', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=tv`));
+      results = data0.results || [];
+    } else {
+      const data = await fetchJson(`${API_BASE}/api/tmdb/discover?type=tv&page=${st.page}`);
+      results = data.results || [];
+    }
     const grid=$("#grid-series"); if(!append){ hideSkeleton('#grid-series'); grid.innerHTML=''; }
     (results).forEach(item => grid.appendChild(makeTmdbCard(item)));
     setupLazyIn('#grid-series');
-    st.page += 1; if(results.length === 0) st.done = true;
+    if(!append) st.page = 2; else st.page += 1; if(results.length === 0) st.done = true;
     ensureSentinel('#grid-series', ()=> loadSeries(true));
   }catch(e){ console.error(e); st.done=true; }
   st.loading=false;
