@@ -83,7 +83,18 @@ app.get('/api/tmdb/tv/:id', async (req, res) => {
 });
 
 // Channels (default)
-const DEFAULT_M3U = process.env.DEFAULT_M3U_URL || '';
+// You can supply multiple URLs separated by commas via DEFAULT_M3U_URLS or DEFAULT_M3U_URL
+const DEFAULT_M3U_URLS = (process.env.DEFAULT_M3U_URLS || process.env.DEFAULT_M3U_URL || '')
+  .split(',').map(s=>s.trim()).filter(Boolean);
+
+// Built-in Arabic packs (iptv-org) used if no env provided
+const ARABIC_DEFAULT_PACKS = [
+  'https://iptv-org.github.io/iptv/languages/ara.m3u',
+  'https://iptv-org.github.io/iptv/countries/sa.m3u',
+  'https://iptv-org.github.io/iptv/countries/ae.m3u',
+  'https://iptv-org.github.io/iptv/countries/eg.m3u',
+  'https://iptv-org.github.io/iptv/countries/ma.m3u'
+];
 function parseM3U(text) {
   const lines = text.split(/\r?\n/);
   const channels = [];
@@ -113,20 +124,25 @@ function parseM3U(text) {
 app.get('/api/channels', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit || '250', 10);
-    if (DEFAULT_M3U) {
-      const data = await remember(`m3u_${DEFAULT_M3U}`, 30 * 60 * 1000, async () => {
-        const r = await axios.get(DEFAULT_M3U, { responseType: 'text' });
-        return r.data;
-      });
-      const all = parseM3U(data);
-      return res.json({ channels: all.slice(0, limit) });
+    const urlList = (DEFAULT_M3U_URLS.length ? DEFAULT_M3U_URLS : ARABIC_DEFAULT_PACKS);
+
+    // Fetch and merge multiple M3U sources
+    const texts = await Promise.all(urlList.map(u => remember(`m3u_${u}`, 30 * 60 * 1000, async () => {
+      try { const r = await axios.get(u, { responseType: 'text', timeout: 20000 }); return r.data; }
+      catch { return ''; }
+    })));
+    const merged = [];
+    for (const t of texts) {
+      if (!t) continue; merged.push(...parseM3U(t));
     }
-    // fallback sample
-    const sample = [
-      { id: 'sample-1', name: 'Sample News', logo: '', group: 'News', streams: [{ url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }] },
-      { id: 'sample-2', name: 'Sample Sports', logo: '', group: 'Sports', streams: [{ url: 'https://moq-01.akamaized.net/live/eds/Sporty_1/playlist.m3u8' }] }
-    ];
-    res.json({ channels: sample.slice(0, limit) });
+    // Dedupe by id then by name
+    const seen = new Set();
+    const unique = [];
+    for (const ch of merged) {
+      const key = (ch.id || ch.name || '').toLowerCase();
+      if (!key || seen.has(key)) continue; seen.add(key); unique.push(ch);
+    }
+    res.json({ channels: unique.slice(0, limit) });
   } catch (e) {
     res.status(500).json({ error: 'channels_failed' });
   }

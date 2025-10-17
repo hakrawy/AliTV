@@ -144,6 +144,48 @@ $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
   `;
   box.appendChild(xt);
 
+  // Quick Packs (iptv-org Arabic/Countries)
+  const packsWrap = document.createElement('div'); packsWrap.style.marginTop = '8px';
+  packsWrap.style.display = 'flex'; packsWrap.style.alignItems = 'center'; packsWrap.style.gap = '8px';
+  packsWrap.innerHTML = `
+    <label style="margin-inline-end:8px">Quick Packs</label>
+    <select id="packSelect" style="background:#17171e;color:#e5e5e5;border:1px solid #2a2a33;border-radius:8px;padding:6px 8px;max-width:280px"></select>
+    <button id="loadPackBtn" class="primary ripple">Load</button>
+  `;
+  box.appendChild(packsWrap);
+  const packs = [
+    { label: 'Arabic (All)', url: 'https://iptv-org.github.io/iptv/languages/ara.m3u' },
+    { label: 'Saudi Arabia', url: 'https://iptv-org.github.io/iptv/countries/sa.m3u' },
+    { label: 'United Arab Emirates', url: 'https://iptv-org.github.io/iptv/countries/ae.m3u' },
+    { label: 'Qatar', url: 'https://iptv-org.github.io/iptv/countries/qa.m3u' },
+    { label: 'Egypt', url: 'https://iptv-org.github.io/iptv/countries/eg.m3u' },
+    { label: 'Morocco', url: 'https://iptv-org.github.io/iptv/countries/ma.m3u' },
+    { label: 'Algeria', url: 'https://iptv-org.github.io/iptv/countries/dz.m3u' },
+    { label: 'Tunisia', url: 'https://iptv-org.github.io/iptv/countries/tn.m3u' },
+    { label: 'Jordan', url: 'https://iptv-org.github.io/iptv/countries/jo.m3u' },
+    { label: 'Iraq', url: 'https://iptv-org.github.io/iptv/countries/iq.m3u' },
+    { label: 'Kuwait', url: 'https://iptv-org.github.io/iptv/countries/kw.m3u' },
+    { label: 'Bahrain', url: 'https://iptv-org.github.io/iptv/countries/bh.m3u' },
+    { label: 'Oman', url: 'https://iptv-org.github.io/iptv/countries/om.m3u' },
+    { label: 'Yemen', url: 'https://iptv-org.github.io/iptv/countries/ye.m3u' },
+    { label: 'Lebanon', url: 'https://iptv-org.github.io/iptv/countries/lb.m3u' },
+    { label: 'Syria', url: 'https://iptv-org.github.io/iptv/countries/sy.m3u' },
+    { label: 'Palestine', url: 'https://iptv-org.github.io/iptv/countries/ps.m3u' },
+    { label: 'Sudan', url: 'https://iptv-org.github.io/iptv/countries/sd.m3u' },
+    { label: 'Libya', url: 'https://iptv-org.github.io/iptv/countries/ly.m3u' }
+  ];
+  const packSel = packsWrap.querySelector('#packSelect');
+  packs.forEach(p=>{ const o=document.createElement('option'); o.value=p.url; o.textContent=p.label; packSel.appendChild(o); });
+  packsWrap.querySelector('#loadPackBtn').addEventListener('click', async ()=>{
+    const url = packSel.value; if(!url) return;
+    showSkeleton('#grid-livetv', 10);
+    try{
+      const r=await fetch(`${API_BASE}/api/parse-m3u`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+      const j=await r.json(); allChannels=j.channels||[]; renderChannels(allChannels);
+    }catch{ alert(t('error')); }
+    hideSkeleton('#grid-livetv');
+  });
+
   const modeSel = document.querySelector('#importMode');
   modeSel.onchange = ()=>{
     const useXt = modeSel.value === 'xtream';

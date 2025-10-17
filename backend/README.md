@@ -22,7 +22,8 @@ npm start
 - `PORT` (default `3000`)
 - `TMDB_API_KEY` – your TMDB v3 API key
 - `CORS_ORIGIN` – allowed origin (default `*` for development)
-- `DEFAULT_M3U_URL` – optional default M3U URL to hydrate `/api/channels`
+- `DEFAULT_M3U_URLS` – optional comma‑separated M3U URLs to hydrate `/api/channels`
+- `DEFAULT_M3U_URL` – legacy single URL (still supported)
 
 ## Endpoints
 
@@ -30,7 +31,8 @@ npm start
 - `GET /api/tmdb/discover?type=movie|tv`
 - `GET /api/tmdb/movie/:id`
 - `GET /api/tmdb/tv/:id`
-- `GET /api/channels?limit=250` – returns channels; uses `DEFAULT_M3U_URL` if set, else sample
+- `GET /api/channels?limit=250` – returns merged channels; uses `DEFAULT_M3U_URLS`/`DEFAULT_M3U_URL` if set,
+  else loads built‑in Arabic packs from iptv‑org (language ara + SA/AE/EG/MA)
 - `POST /api/parse-m3u` – body: `{ url }`
 - `GET /api/epg?channel=<id>&source=<xml-url>` – returns first few EPG items
 - `POST /api/xtream/import` – body: `{ host, port, username, password }`
