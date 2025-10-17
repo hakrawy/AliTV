@@ -4,46 +4,54 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>AliTV — للعائلة والأصدقاء</title>
+
+  <!-- Favicon (اختياري) -->
   <link rel="icon" href="favicon.ico"/>
+
+  <!-- Styles -->
   <link rel="stylesheet" href="styles.css"/>
+
+  <!-- HLS player -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
 <body class="dark">
   <!-- Splash -->
-  <div id="splash">
+  <div id="splash" aria-hidden="true">
     <div class="splash-inner">
       <div class="logo-anim">AliTV</div>
       <div class="tagline">AliTV — Created by Ali for family & friends ❤️</div>
     </div>
-    <audio id="startup-audio" src="startup.mp3" preload="auto"></audio>
+    <audio id="startSound" src="startup.mp3" preload="auto"></audio>
   </div>
 
   <!-- Header -->
   <header id="topbar">
-    <div class="brand glow">AliTV</div>
-    <nav class="tabs">
-      <button class="tab-btn active" data-tab="trending">الشائع الآن</button>
-      <button class="tab-btn" data-tab="movies">أفلام</button>
-      <button class="tab-btn" data-tab="series">مسلسلات</button>
-      <button class="tab-btn" data-tab="livetv">البث المباشر</button>
+    <div class="brand">AliTV</div>
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="trending" role="tab">الشائع الآن</button>
+      <button class="tab-btn" data-tab="movies" role="tab">أفلام</button>
+      <button class="tab-btn" data-tab="series" role="tab">مسلسلات</button>
+      <button class="tab-btn" data-tab="livetv" role="tab">البث المباشر</button>
     </nav>
     <div class="right-tools">
-      <select id="langSelect">
+      <select id="langSelect" aria-label="Language">
         <option value="ar" selected>العربية</option>
         <option value="en">English</option>
       </select>
-      <input id="searchInput" placeholder="بحث..."/>
-      <select id="epgSelect">
+      <input id="searchInput" placeholder="بحث..." aria-label="بحث"/>
+      <select id="epgSelect" title="EPG Source" aria-label="EPG">
         <option value="">EPG: iptv-org (sa-ar)</option>
-        <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية</option>
-        <option value="https://iptv-org.github.io/epg/guides/ae-ar.xml">الإمارات</option>
-        <option value="https://iptv-org.github.io/epg/guides/eg-ar.xml">مصر</option>
+        <option value="https://iptv-org.github.io/epg/guides/sa-ar.xml">السعودية (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/ae-ar.xml">الإمارات (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/qa-ar.xml">قطر (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/eg-ar.xml">مصر (عربي)</option>
+        <option value="https://iptv-org.github.io/epg/guides/ma-ar.xml">المغرب (عربي)</option>
       </select>
     </div>
   </header>
 
   <!-- Hero -->
-  <section id="hero" class="carousel hidden">
+  <section id="hero" class="carousel hidden" aria-hidden="true">
     <div id="carousel-track"></div>
     <div class="carousel-actions">
       <button id="watchNow" class="primary ripple">شاهد الآن</button>
@@ -51,9 +59,10 @@
     </div>
   </section>
 
-  <!-- Main content -->
+  <!-- Main -->
   <main id="content">
-    <section id="section-trending" class="tab-section">
+    <!-- Trending -->
+    <section id="section-trending" class="tab-section" aria-labelledby="tab-trending">
       <div class="filter">
         <button class="pill active" data-type="movie">أفلام</button>
         <button class="pill" data-type="tv">مسلسلات</button>
@@ -62,19 +71,22 @@
       <div id="grid-trending" class="grid fadein"></div>
     </section>
 
-    <section id="section-movies" class="tab-section hidden">
+    <!-- Movies -->
+    <section id="section-movies" class="tab-section hidden" aria-labelledby="tab-movies">
       <h2>أفلام</h2>
       <div id="grid-movies" class="grid fadein"></div>
     </section>
 
-    <section id="section-series" class="tab-section hidden">
+    <!-- Series -->
+    <section id="section-series" class="tab-section hidden" aria-labelledby="tab-series">
       <h2>مسلسلات</h2>
       <div id="grid-series" class="grid fadein"></div>
     </section>
 
-    <section id="section-livetv" class="tab-section hidden">
+    <!-- Live TV -->
+    <section id="section-livetv" class="tab-section hidden" aria-labelledby="tab-livetv">
       <div class="import">
-        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U"/>
+        <input id="m3uUrl" placeholder="الصق رابط قائمة M3U" aria-label="M3U URL"/>
         <button id="importBtn" class="primary ripple">استيراد</button>
         <span class="hint">أو استخدم قائمة iptv-org الافتراضية</span>
       </div>
@@ -85,6 +97,7 @@
         <button class="chip" data-group="sports">رياضة</button>
         <button class="chip" data-group="kids">أطفال</button>
         <button class="chip" data-group="movies">أفلام</button>
+        <button class="chip" data-group="series">مسلسلات</button>
       </div>
 
       <div id="grid-livetv" class="grid fadein"></div>
@@ -100,13 +113,15 @@
     <span>AliTV — صنع بحب ❤️ للأهل والأصدقاء</span>
   </footer>
 
-  <div id="modal" class="hidden modal">
+  <!-- Modal -->
+  <div id="modal" class="hidden modal" aria-hidden="true">
     <div class="modal-body">
-      <button id="closeModal">×</button>
+      <button id="closeModal" title="Close">×</button>
       <div id="modalContent"></div>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="config.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
