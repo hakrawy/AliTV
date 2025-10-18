@@ -487,10 +487,27 @@ function makeFeaturedCard(item){
   el.innerHTML = `<div class="thumb" style="background-image:url('${img}')"></div>
     <div class="meta"><span>${item.title||''}</span></div>`;
   el.onclick = ()=>{
-    // try open TMDB detail if tmdb_id exists by simulating a TMDB item shape
+    if(item.watch_url){ openVod(item.watch_url); return; }
     if(item.tmdb_id){ showMoreInfo({ id:item.tmdb_id, title:item.title, name:item.title, media_type: 'movie' }); }
   };
   return el;
+}
+
+// VOD player via modal using Hls.js
+function openVod(url){
+  const html = `<div style="max-width:900px;margin:auto">
+    <video id="vodPlayer" controls playsinline style="width:100%;max-height:70vh;background:#000"></video>
+  </div>`;
+  openModal(html);
+  setTimeout(()=>{
+    const v = document.getElementById('vodPlayer');
+    try{
+      if(window.Hls && window.Hls.isSupported() && /\.m3u8(\?|$)/i.test(url)){
+        if(window.__vodHls) window.__vodHls.destroy();
+        const hls = new Hls(); window.__vodHls = hls; hls.loadSource(url); hls.attachMedia(v); hls.on(Hls.Events.MANIFEST_PARSED, ()=> v.play().catch(()=>{}));
+      } else { v.src = url; v.play().catch(()=>{}); }
+    }catch(e){ console.error(e); }
+  }, 50);
 }
 
 // ===== Live TV =====
