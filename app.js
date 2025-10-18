@@ -1,4 +1,18 @@
 // ===== helpers =====
+// ===== safeFetch helper =====
+async function safeFetch(url, options = {}) {
+  console.log("%c[FRONTEND] ⏳ Fetching:", "color:cyan", url);
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status} - ${res.statusText}`);
+    console.log("%c[FRONTEND] ✅ Success:", "color:green", url);
+    return await res.json();
+  } catch (err) {
+    console.error("%c[FRONTEND] ❌ Error fetching:", "color:red", url, err);
+    alert("⚠️ مشكلة في الاتصال بالسيرفر. تأكد أن الـ backend يعمل.");
+    throw err;
+  }
+}
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
@@ -180,8 +194,8 @@ $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
     const url = packSel.value; if(!url) return;
     showSkeleton('#grid-livetv', 10);
     try{
-      const r=await fetch(`${API_BASE}/api/parse-m3u`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
-      const j=await r.json(); allChannels=j.channels||[]; renderChannels(allChannels);
+  const j=await safeFetch(`${API_BASE}/api/parse-m3u`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  allChannels=j.channels||[]; renderChannels(allChannels);
     }catch{ alert(t('error')); }
     hideSkeleton('#grid-livetv');
   });
@@ -207,12 +221,12 @@ $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
     try{
       let resp;
       try{
-        resp = await fetch(`${API_BASE}/api/xtream/import`,{
+        resp = await safeFetch(`${API_BASE}/api/xtream/import`,{
           method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
           body: JSON.stringify({ host, port, username, password })
         });
       } catch(e1){
-        resp = await fetch(`${API_BASE}/api/xc/import`,{
+        resp = await safeFetch(`${API_BASE}/api/xc/import`,{
           method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
           body: JSON.stringify({ host, port, username, password })
         });
@@ -220,7 +234,7 @@ $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
       let data = await resp.json();
       if(!resp.ok){
         if(resp.status===404){
-          const r2 = await fetch(`${API_BASE}/api/xc/import`,{
+          const r2 = await safeFetch(`${API_BASE}/api/xc/import`,{
             method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
             body: JSON.stringify({ host, port, username, password })
           });
@@ -314,10 +328,10 @@ async function loadTrending(type="movie", append=false){
   try{
     let results = [];
     if(!append){
-      const data0 = await cacheFetch(`tmdb_trending_${type}`, ()=> fetchJson(`${API_BASE}/api/tmdb/trending?type=${type}`));
+  const data0 = await cacheFetch(`tmdb_trending_${type}`, ()=> safeFetch(`${API_BASE}/api/tmdb/trending?type=${type}`));
       results = data0.results || [];
     } else {
-      const data = await fetchJson(`${API_BASE}/api/tmdb/trending?type=${type}&page=${st.page}`);
+  const data = await safeFetch(`${API_BASE}/api/tmdb/trending?type=${type}&page=${st.page}`);
       results = data.results || [];
     }
     const grid = $('#grid-trending'); if(!append){ hideSkeleton('#grid-trending'); grid.innerHTML=''; }
@@ -454,10 +468,10 @@ async function loadMovies(append=false){
     }
     let results=[];
     if(!append){
-      const data0 = await cacheFetch('tmdb_movies', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=movie`));
+  const data0 = await cacheFetch('tmdb_movies', ()=> safeFetch(`${API_BASE}/api/tmdb/discover?type=movie`));
       results = data0.results || [];
     } else {
-      const data = await fetchJson(`${API_BASE}/api/tmdb/discover?type=movie&page=${st.page}`);
+  const data = await safeFetch(`${API_BASE}/api/tmdb/discover?type=movie&page=${st.page}`);
       results = data.results || [];
     }
     const grid=$("#grid-movies"); if(!append){ hideSkeleton('#grid-movies'); grid.innerHTML=''; }
@@ -484,10 +498,10 @@ async function loadSeries(append=false){
     }
     let results=[];
     if(!append){
-      const data0 = await cacheFetch('tmdb_series', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=tv`));
+  const data0 = await cacheFetch('tmdb_series', ()=> safeFetch(`${API_BASE}/api/tmdb/discover?type=tv`));
       results = data0.results || [];
     } else {
-      const data = await fetchJson(`${API_BASE}/api/tmdb/discover?type=tv&page=${st.page}`);
+  const data = await safeFetch(`${API_BASE}/api/tmdb/discover?type=tv&page=${st.page}`);
       results = data.results || [];
     }
     const grid=$("#grid-series"); if(!append){ hideSkeleton('#grid-series'); grid.innerHTML=''; }
@@ -533,7 +547,7 @@ function openVod(url){
 let allChannels=[];
 async function loadLiveTV(){
   showSkeleton("#grid-livetv", 10);
-  const data = await cacheFetch("alitv_channels", ()=> fetch(`${API_BASE}/api/channels?limit=250`).then(r=>r.json()));
+  const data = await cacheFetch("alitv_channels", ()=> safeFetch(`${API_BASE}/api/channels?limit=250`));
   allChannels = data.channels||[];
   hideSkeleton("#grid-livetv");
   renderChannels(allChannels);
@@ -591,9 +605,8 @@ async function playChannel(ch){
   const srcSelect = $("#epgSelect");
   const srcVal = srcSelect.value || CONFIG.defaultEPG;
   try{
-    const r = await fetch(`${API_BASE}/api/epg?channel=${encodeURIComponent(ch.id)}&source=${encodeURIComponent(srcVal)}`);
-    const j = await r.json();
-    const first=(j.items||[])[0];
+  const j = await safeFetch(`${API_BASE}/api/epg?channel=${encodeURIComponent(ch.id)}&source=${encodeURIComponent(srcVal)}`);
+  const first=(j.items||[])[0];
     const title = first?.title ? (first.title._ || first.title) : "";
     epgNow.textContent = title ? `الآن يعرض: ${title}` : "لا توجد بيانات حالياً";
   }catch{ epgNow.textContent="تعذر جلب الدليل"; }
