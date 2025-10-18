@@ -237,6 +237,8 @@
             <form id="form">
               <input type="hidden" id="id"/>
               ${fields.map(f=>`<label>${f.label}</label><input type="${f.type}" id="${f.key}"/>`).join('')}
+              <label>Streams (URL) — one per line</label>
+              <textarea id="streams" rows="4" placeholder="https://...\nhttps://..."></textarea>
               <label><input type="checkbox" id="visible" checked/> ظاهر للعامة</label>
               <div style="margin-top:8px; display:flex; gap:8px;">
                 <button class="btn primary" type="submit">حفظ</button>
@@ -288,6 +290,7 @@
         title: $('#title').value.trim(),
         poster: $('#poster').value.trim(),
         overview: $('#overview').value.trim(),
+        streams: $('#streams').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(url=>({url})),
         visible: $('#visible').checked
       };
       const body = JSON.stringify(bodyObj);
@@ -334,6 +337,7 @@
       $('#title').value = item?.title || '';
       $('#poster').value = item?.poster || '';
       $('#overview').value = item?.overview || '';
+      $('#streams').value = (item?.streams||[]).map(s=>s.url||s).filter(Boolean).join('\n');
       $('#visible').checked = !!(item?.visible ?? true);
     }
   }
