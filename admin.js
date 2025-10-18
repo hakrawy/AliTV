@@ -4,7 +4,7 @@
   if(!root) return;
 
   const TOKEN_KEY = 'alitv_admin_token';
-  const API = (typeof API_BASE !== 'undefined') ? API_BASE : '';
+  const API = (typeof API_BASE !== 'undefined') ? API_BASE : 'https://hakrawy-backend.onrender.com';
 
   const state = {
     token: sessionStorage.getItem(TOKEN_KEY) || null,
