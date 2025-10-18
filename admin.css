@@ -1,0 +1,20 @@
+/* Minimal admin styles to blend with existing theme */
+.admin-link { margin-inline-end: 12px; color: #9ad; text-decoration: none; font-weight: 600; }
+.admin { padding: 16px; }
+.admin .admin-nav { display:flex; gap:8px; margin-bottom:12px; }
+.admin .admin-nav a { padding:8px 12px; border-radius:8px; background:#1f2430; color:#cfd8dc; text-decoration:none; }
+.admin .admin-nav a.active { background:#3a4152; color:#fff; }
+.admin .panel { background:#121826; border:1px solid #2a3142; border-radius:12px; padding:12px; margin-bottom:16px; }
+.admin h2 { margin:8px 0 12px; }
+.admin form label { display:block; margin:8px 0 4px; font-size:0.9rem; color:#b0bec5; }
+.admin input[type="text"], .admin input[type="number"], .admin textarea { width:100%; padding:8px; border-radius:8px; border:1px solid #2a3142; background:#0d1220; color:#e0e0e0; }
+.admin textarea { min-height:90px; }
+.admin .row { display:flex; gap:12px; }
+.admin .row > * { flex:1; }
+.admin table { width:100%; border-collapse: collapse; }
+.admin th, .admin td { border-bottom:1px solid #273041; padding:8px; text-align:start; }
+.admin .btn { padding:6px 10px; border-radius:8px; border:1px solid #2a3142; background:#1b2230; color:#cfd8dc; cursor:pointer; }
+.admin .btn.primary { background:#2b6cb0; border-color:#2b6cb0; color:#fff; }
+.admin .btn.ghost { background:transparent; }
+.hidden { display:none !important; }
+.admin .muted { color:#9aa; font-size:0.9rem; }

@@ -6,6 +6,7 @@
   <title>AliTV — للعائلة والأصدقاء</title>
   <link rel="icon" href="favicon.ico"/>
   <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="admin.css"/>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
 <body class="dark">
@@ -28,6 +29,7 @@
       <button class="tab-btn" data-tab="livetv" role="tab">البث المباشر</button>
     </nav>
     <div class="right-tools">
+      <a id="adminLink" href="#/admin" class="admin-link" title="Admin">Admin</a>
       <select id="langSelect" aria-label="Language">
         <option value="ar" selected>العربية</option>
         <option value="en">English</option>
@@ -104,6 +106,9 @@
     </section>
   </main>
 
+  <!-- Admin Root -->
+  <section id="admin-root" class="admin hidden" aria-hidden="true"></section>
+
   <footer id="footer">
     <span>AliTV — صنع بحب ❤️ للأهل والأصدقاء</span>
   </footer>
@@ -119,5 +124,6 @@
   <script src="config.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
