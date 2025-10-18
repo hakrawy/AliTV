@@ -14,7 +14,10 @@
   const resolved = lsOverride || (isGitHubPages ? FORCED_PROD_BASE : (globalOverride || defaultBase));
 
   try { (typeof globalThis!=='undefined' ? globalThis : window).API_BASE = resolved; } catch {}
-  if (win) win.__RESOLVED_API_BASE__ = resolved;
+  if (win) {
+    win.__RESOLVED_API_BASE__ = resolved;
+    win.RESOLVED_API_BASE = resolved; // alias for consumers expecting this name
+  }
 })();
 const TMDB_API_KEY = "0775f71fe7655df78ef9d1738087d4e6";
 
