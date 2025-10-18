@@ -15,11 +15,36 @@
 
   async function api(path, opts={}){
     const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers||{});
+    // Spoof as mobile app for xtream/xc imports
+    const isXtream = typeof path === 'string' && (path.includes('/import/xtream') || path.includes('/import/xc') || path.includes('/api/xtream') || path.includes('/api/xc'));
+    if (isXtream) {
+      headers['X-Device-UA'] = headers['X-Device-UA'] || 'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0';
+      headers['X-App-Platform'] = headers['X-App-Platform'] || 'android';
+      headers['X-App-Version'] = headers['X-App-Version'] || '1.0.0';
+    }
     if(state.token) headers['Authorization'] = `Bearer ${state.token}`;
-    const r = await fetch(`${API}${path}`, { ...opts, headers });
-    const text = await r.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch { data = null; }
-    if(!r.ok) throw new Error(data?.error || `HTTP ${r.status}`);
-    return data;
+    async function doFetch(p){
+      let r;
+      try { r = await fetch(`${API}${p}`, { ...opts, headers }); }
+      catch (err) {
+        // Network/blocked request fallback for xtream
+        if (p === '/api/admin/import/xtream') return await doFetch('/api/admin/import/xc');
+        if (p === '/api/xtream' || p === '/api/xtream/import') return await doFetch(p.replace('/api/xtream','/api/xc'));
+        throw err;
+      }
+      const text = await r.text(); let data = null; try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+      if(!r.ok){
+        if (r.status === 404){
+          // Fallback aliases
+          if (p === '/api/admin/import/tmdb') return await doFetch('/api/admin/tmdb/import');
+          if (p === '/api/admin/import/xtream') return await doFetch('/api/admin/import/xc');
+          if (p.startsWith('/api/xtream')) return await doFetch(p.replace('/api/xtream','/api/xc'));
+        }
+        throw new Error(data?.error || `HTTP ${r.status}`);
+      }
+      return data;
+    }
+    return await doFetch(path);
   }
 
   function nav(){

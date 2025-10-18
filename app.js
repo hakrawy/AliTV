@@ -205,12 +205,31 @@ $("#closeModal").onclick = ()=> $("#modal").classList.add("hidden");
     if(!host || !username || !password){ alert(t('error')); return; }
     showSkeleton('#grid-livetv', 10);
     try{
-      const resp = await fetch(`${API_BASE}/api/xtream/import`,{
-        method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
-        body: JSON.stringify({ host, port, username, password })
-      });
-      const data = await resp.json();
-      if(!resp.ok) throw new Error('xtream failed');
+      let resp;
+      try{
+        resp = await fetch(`${API_BASE}/api/xtream/import`,{
+          method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
+          body: JSON.stringify({ host, port, username, password })
+        });
+      } catch(e1){
+        resp = await fetch(`${API_BASE}/api/xc/import`,{
+          method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
+          body: JSON.stringify({ host, port, username, password })
+        });
+      }
+      let data = await resp.json();
+      if(!resp.ok){
+        if(resp.status===404){
+          const r2 = await fetch(`${API_BASE}/api/xc/import`,{
+            method:'POST', headers:{'Content-Type':'application/json','X-Device-UA':'Dalvik/2.1.0 (Linux; U; Android 10) AliTV/1.0'},
+            body: JSON.stringify({ host, port, username, password })
+          });
+          if(!r2.ok) throw new Error('xtream failed');
+          data = await r2.json();
+        } else {
+          throw new Error('xtream failed');
+        }
+      }
       allChannels = data.channels || [];
       renderChannels(allChannels);
     }catch(e){ alert(t('error')); }
