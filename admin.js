@@ -68,6 +68,28 @@
     root.innerHTML = nav() + `
       <div class="admin panel" id="${containerId}">
         <h2>القنوات</h2>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>استيراد قنوات</h3>
+          <div class="row">
+            <div>
+              <h4>M3U</h4>
+              <input type="text" id="impM3uUrl" placeholder="https://.../index.m3u"/>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <select id="impM3uMode"><option value="append">إضافة</option><option value="replace">استبدال الكل</option></select>
+                <button class="btn" id="impM3uBtn">استيراد M3U</button>
+              </div>
+            </div>
+            <div>
+              <h4>Xtream Codes</h4>
+              <div class="row"><input type="text" id="impXtHost" placeholder="host or http://host"/><input type="number" id="impXtPort" placeholder="80"/></div>
+              <div class="row"><input type="text" id="impXtUser" placeholder="username"/><input type="password" id="impXtPass" placeholder="password"/></div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <select id="impXtMode"><option value="append">إضافة</option><option value="replace">استبدال الكل</option></select>
+                <button class="btn" id="impXtBtn">استيراد Xtream</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div>
             <form id="chForm">
@@ -98,6 +120,30 @@
     `;
     document.getElementById('logoutBtn').onclick = async ()=>{ try{ await api('/api/admin/logout',{method:'POST'});}catch{} setToken(null); location.hash = '#/admin'; };
     document.getElementById('chReset').onclick = ()=> fillChForm();
+    // import handlers
+    const m3uBtn = document.getElementById('impM3uBtn');
+    m3uBtn.onclick = async ()=>{
+      const url = document.getElementById('impM3uUrl').value.trim();
+      const mode = document.getElementById('impM3uMode').value;
+      if(!url) return alert('ضع رابط M3U');
+      m3uBtn.disabled = true; m3uBtn.textContent = 'جارٍ...';
+      try{ await api('/api/admin/import/m3u', { method:'POST', body: JSON.stringify({ url, mode }) }); await loadChList(); alert('تم الاستيراد'); }
+      catch(e){ alert(e.message||'فشل الاستيراد'); }
+      finally{ m3uBtn.disabled=false; m3uBtn.textContent='استيراد M3U'; }
+    };
+    const xtBtn = document.getElementById('impXtBtn');
+    xtBtn.onclick = async ()=>{
+      const host = document.getElementById('impXtHost').value.trim();
+      const port = document.getElementById('impXtPort').value.trim();
+      const username = document.getElementById('impXtUser').value.trim();
+      const password = document.getElementById('impXtPass').value.trim();
+      const mode = document.getElementById('impXtMode').value;
+      if(!host || !username || !password) return alert('أكمل بيانات Xtream');
+      xtBtn.disabled = true; xtBtn.textContent = 'جارٍ...';
+      try{ await api('/api/admin/import/xtream', { method:'POST', body: JSON.stringify({ host, port, username, password, mode }) }); await loadChList(); alert('تم الاستيراد'); }
+      catch(e){ alert(e.message||'فشل الاستيراد'); }
+      finally{ xtBtn.disabled=false; xtBtn.textContent='استيراد Xtream'; }
+    };
     document.getElementById('chForm').onsubmit = async (e)=>{
       e.preventDefault();
       const id = Number(document.getElementById('chId').value||0) || null;
@@ -167,6 +213,25 @@
     root.innerHTML = nav() + `
       <div class="admin panel">
         <h2>${names[kind]}</h2>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>استيراد TMDB (${names[kind]})</h3>
+          <div class="row">
+            <div>
+              <label>أIDs (مفصولة بفواصل)</label>
+              <input type="text" id="tmdbIds" placeholder="550, 299534"/>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn" id="tmdbIdsBtn">استيراد حسب ID</button>
+              </div>
+            </div>
+            <div>
+              <label>مصدر تلقائي</label>
+              <div style="display:flex; gap:8px;">
+                <button class="btn" id="tmdbTrendingBtn">Trending</button>
+                <button class="btn" id="tmdbDiscoverBtn">Discover</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div>
             <form id="form">
@@ -190,6 +255,31 @@
     `;
     document.getElementById('logoutBtn').onclick = async ()=>{ try{ await api('/api/admin/logout',{method:'POST'});}catch{} setToken(null); location.hash = '#/admin'; };
     document.getElementById('reset').onclick = ()=> fill();
+    // TMDB import handlers
+    const idsBtn = document.getElementById('tmdbIdsBtn');
+    idsBtn.onclick = async ()=>{
+      const txt = document.getElementById('tmdbIds').value.trim();
+      const ids = txt ? txt.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>!isNaN(n)) : [];
+      if(!ids.length) return alert('أدخل IDs');
+      idsBtn.disabled = true; idsBtn.textContent='جارٍ...';
+      try{ await api('/api/admin/import/tmdb', { method:'POST', body: JSON.stringify({ type: kind==='movies'?'movie':'tv', ids }) }); await loadList(); alert('تم'); }
+      catch(e){ alert(e.message||'فشل'); }
+      finally{ idsBtn.disabled=false; idsBtn.textContent='استيراد حسب ID'; }
+    };
+    const trendingBtn = document.getElementById('tmdbTrendingBtn');
+    trendingBtn.onclick = async ()=>{
+      trendingBtn.disabled=true; trendingBtn.textContent='جارٍ...';
+      try{ await api('/api/admin/import/tmdb', { method:'POST', body: JSON.stringify({ type: kind==='movies'?'movie':'tv', trending: true, limit: 20 }) }); await loadList(); alert('تم'); }
+      catch(e){ alert(e.message||'فشل'); }
+      finally{ trendingBtn.disabled=false; trendingBtn.textContent='Trending'; }
+    };
+    const discoverBtn = document.getElementById('tmdbDiscoverBtn');
+    discoverBtn.onclick = async ()=>{
+      discoverBtn.disabled=true; discoverBtn.textContent='جارٍ...';
+      try{ await api('/api/admin/import/tmdb', { method:'POST', body: JSON.stringify({ type: kind==='movies'?'movie':'tv', discover: true, limit: 20 }) }); await loadList(); alert('تم'); }
+      catch(e){ alert(e.message||'فشل'); }
+      finally{ discoverBtn.disabled=false; discoverBtn.textContent='Discover'; }
+    };
     document.getElementById('form').onsubmit = async (e)=>{
       e.preventDefault();
       const id = Number($('#id').value||0) || null;
@@ -284,4 +374,3 @@
   window.addEventListener('hashchange', route);
   route();
 })();
-

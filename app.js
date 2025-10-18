@@ -423,6 +423,16 @@ async function loadMovies(append=false){
   if(st.loading || st.done) return; st.loading=true;
   if(!append) showSkeleton('#grid-movies');
   try{
+    // Featured from backend (admin-curated)
+    if(!append){
+      try{
+        const containerId = 'grid-movies-featured';
+        let cont = document.getElementById(containerId);
+        const grid = document.getElementById('grid-movies');
+        if(!cont && grid && grid.parentElement){ cont = document.createElement('div'); cont.id = containerId; cont.className = 'grid fadein'; grid.parentElement.insertBefore(cont, grid); }
+        if(cont){ cont.innerHTML=''; const feat = await fetchJson(`${API_BASE}/api/movies?limit=20`); const items = feat.items||[]; items.forEach(it=> cont.appendChild(makeFeaturedCard(it))); setupLazyIn('#'+containerId); }
+      }catch(e){ /* ignore featured failure */ }
+    }
     let results=[];
     if(!append){
       const data0 = await cacheFetch('tmdb_movies', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=movie`));
@@ -444,6 +454,15 @@ async function loadSeries(append=false){
   if(st.loading || st.done) return; st.loading=true;
   if(!append) showSkeleton('#grid-series');
   try{
+    if(!append){
+      try{
+        const containerId = 'grid-series-featured';
+        let cont = document.getElementById(containerId);
+        const grid = document.getElementById('grid-series');
+        if(!cont && grid && grid.parentElement){ cont = document.createElement('div'); cont.id = containerId; cont.className = 'grid fadein'; grid.parentElement.insertBefore(cont, grid); }
+        if(cont){ cont.innerHTML=''; const feat = await fetchJson(`${API_BASE}/api/series?limit=20`); const items = feat.items||[]; items.forEach(it=> cont.appendChild(makeFeaturedCard(it))); setupLazyIn('#'+containerId); }
+      }catch(e){ /* ignore featured failure */ }
+    }
     let results=[];
     if(!append){
       const data0 = await cacheFetch('tmdb_series', ()=> fetchJson(`${API_BASE}/api/tmdb/discover?type=tv`));
@@ -459,6 +478,19 @@ async function loadSeries(append=false){
     ensureSentinel('#grid-series', ()=> loadSeries(true));
   }catch(e){ console.error(e); st.done=true; }
   st.loading=false;
+}
+
+// helper card for backend featured items
+function makeFeaturedCard(item){
+  const el=document.createElement('div'); el.className='card';
+  const img = item.poster || '';
+  el.innerHTML = `<div class="thumb" style="background-image:url('${img}')"></div>
+    <div class="meta"><span>${item.title||''}</span></div>`;
+  el.onclick = ()=>{
+    // try open TMDB detail if tmdb_id exists by simulating a TMDB item shape
+    if(item.tmdb_id){ showMoreInfo({ id:item.tmdb_id, title:item.title, name:item.title, media_type: 'movie' }); }
+  };
+  return el;
 }
 
 // ===== Live TV =====
